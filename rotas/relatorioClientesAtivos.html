@@ -1,0 +1,56 @@
+<div ng-controller="relatorioClientesAtivosCtrl">
+
+<div class="container-fluid" id="tela_principal">
+	<div class="row" id='containerMensagemErro'>
+		<div class="col-12">
+				<div id="mensagemErroConexao" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> Falha na conexão com o servidor, verifique sua internet
+				</div>
+				<div id="mensagemErroDesconhecido" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> O servidor parece estar com problema
+				</div>
+		</div>
+	</div>
+  <div class="container" id='plotDados'>
+	<div class="row">
+		<div class="col-11">
+			<img src="imgs/logo.png" alt="logo" style="width:40px; float: left;">
+  			<h1 style="color: rgb(173,14,10);">SEC Publicidade</h1>
+  		</div>
+  		<div class="col-1">
+  			<span class="fa fa-print" style="cursor: pointer; font-size: 12pt;" aria-hidden="true" ng-click="imprimir()"></span>
+  		</div>
+  	</div>
+  	<hr>
+  	  <table class="table table-responsive-sm">
+	    <thead>
+	      <tr>
+	        <th>Nome</th>
+	        <th>Dados</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="x in lista">
+	        <td style="width: 40%;">{{x.nomeCliente}}</td>
+	        <td style="width: 60%;">
+	        	<ul class="list-group">
+				  <li class="list-group-item">{{x.logradouro}}, {{x.bairro}} - {{x.cidade}}/{{x.UF}}<br><b>CEP: </b>{{x.cep}}</li>
+				  <li class="list-group-item"><b>Complemento: </b>{{x.complemento}}</li>
+				  <li class="list-group-item"><b>Telefone: </b>{{x.telefone}}, <b>Celular: </b>{{x.celular}}, <b>Fax: </b>{{x.fax}}</li>
+				  <li class="list-group-item"><b>Contato: </b>{{x.contato}}</li>
+				  <li class="list-group-item"><b>E-Mail: </b>{{x.email}}</li>
+				  <li class="list-group-item"><b>CNPJ/CPF: </b>{{x.cgcCpf}}</li>
+				  <li class="list-group-item"><b>Homepage: </b>{{x.homepage}}</li>
+				  <li class="list-group-item"><b>Insc. Estadual: </b>{{x.inscEstadual}}, <b>Insc. Municipal: </b>{{x.inscMunicipal}}</li>
+				  <li class="list-group-item"><b>Titular: </b>{{x.titular}}, <b>CPF: </b>{{x.titularCpf}}</li>
+				  <li class="list-group-item"><b>Observação: </b>{{x.observacao}}</li>
+				</ul>
+	        </td>
+	      </tr>
+	    </tbody>
+	  </table>
+  </div>
+
+</div>
+
+</div>

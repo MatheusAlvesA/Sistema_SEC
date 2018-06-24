@@ -1,0 +1,64 @@
+<div ng-controller="relatorioClientesAtrasadosCtrl">
+
+<div class="container-fluid" id="tela_principal">
+	<div class="row" id='containerMensagemErro'>
+		<div class="col-12">
+				<div id="mensagemErroConexao" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> Falha na conexão com o servidor, verifique sua internet
+				</div>
+				<div id="mensagemErroDesconhecido" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> O servidor parece estar com problema
+				</div>
+		</div>
+	</div>
+  <div class="container" id='plotDados'>
+	<div class="row">
+		<div class="col-11">
+			<img src="imgs/logo.png" alt="logo" style="width:40px; float: left;">
+  			<h1 style="color: rgb(173,14,10);">SEC Publicidade</h1>
+  		</div>
+  		<div class="col-1">
+  			<span class="fa fa-print" style="cursor: pointer; font-size: 12pt;" aria-hidden="true" ng-click="imprimir()"></span>
+  		</div>
+  	</div>
+  	<hr>
+  	<div ng-repeat="cliente in listaClientes">
+  		<h4>{{cliente.nomeCliente}}</h4>
+  	  <table class="table table-responsive-sm">
+	    <thead>
+	      <tr>
+	        <th>Contato</th>
+	        <th>Telefone</th>
+	        <th>Dívida</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+	        <td style="width: 30%;">{{cliente.contato}}</td>
+	        <td style="width: 20%;"><b>Telefone: </b>{{cliente.telefone}}<br><b>Celular: </b>{{cliente.celular}}</td>
+	        <td style="width: 20%;"><b>Bruto: </b>{{cliente.somaBruto | dinheiro }} <br> <b>Liquido: </b>{{cliente.somaLiquido | dinheiro }}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+
+  	  <table class="table table-responsive-sm" ng-repeat="contrato in cliente.contratos">
+	    <thead>
+	      <tr>
+	        <th colspan="4">Contrato: {{contrato.idContrato}}</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="item in contrato.itens">
+	        <td style="width: 25%;"><b>Vencimento: </b>{{item.dataVencimento}}</td>
+	        <td style="width: 25%;"><b>Bruto: </b>{{item.valorBruto | dinheiro}}</td>
+	        <td style="width: 25%;"><b>Liquido: </b>{{item.valorLiquido | dinheiro}}</td>
+	        <td style="width: 25%;"><b>Nota fiscal: </b>{{item.notaFiscal}}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <br><hr><br>
+  </div>
+
+</div>
+
+</div>

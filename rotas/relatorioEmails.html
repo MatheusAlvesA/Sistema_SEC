@@ -1,0 +1,45 @@
+<div ng-controller="relatorioEmailCtrl">
+
+<div class="container-fluid" id="tela_principal">
+	<div class="row" id='containerMensagemErro'>
+		<div class="col-12">
+				<div id="mensagemErroConexao" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> Falha na conexão com o servidor, verifique sua internet
+				</div>
+				<div id="mensagemErroDesconhecido" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> O servidor parece estar com problema
+				</div>
+		</div>
+	</div>
+  <div class="container" id='plotDados'>
+	<div class="row">
+		<div class="col-11">
+			<img src="imgs/logo.png" alt="logo" style="width:40px; float: left;">
+  			<h1 style="color: rgb(173,14,10);">SEC Publicidade</h1>
+  		</div>
+  		<div class="col-1">
+  			<span class="fa fa-print" style="cursor: pointer; font-size: 12pt;" aria-hidden="true" ng-click="imprimir()"></span>
+  		</div>
+  	</div>
+  	<hr>
+  	  <table class="table table-responsive-sm">
+	    <thead>
+	      <tr>
+	        <th>Cliente</th>
+	        <th>Email</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="x in lista">
+	        <td>{{x.nome}}</td>
+	        <td>
+	        	{{x.email}}
+	        </td>
+	      </tr>
+	    </tbody>
+	  </table>
+  </div>
+
+</div>
+
+</div>

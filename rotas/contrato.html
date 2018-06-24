@@ -1,0 +1,496 @@
+<div ng-controller="ContratoCtrl">
+
+<ul class="nav nav-pills nav-justified">
+  <li class="nav-item" onclick="trocarTelaContratos(1)">
+    <a class="nav-link active" id="bnt_tela_busca" href="">Buscar Contrato <span class="fa fa-search" aria-hidden="true"></span></a>
+  </li>
+  <li class="nav-item" onclick="trocarTelaContratos(2)">
+    <a class="nav-link" id="bnt_tela_criacao" href="">Criar Contrato <span class="fa fa-clipboard" aria-hidden="true"></span></a>
+  </li>
+</ul>
+
+<hr>
+
+<div class="container-fluid" id="tela_busca">
+
+	<div id="mensagemErroConexao" class="alert alert-danger" style="display: none;">
+	    <strong>Erro!</strong> Falha na conexão com o servidor
+	</div>
+	<div id="mensagemErroConsultar" class="alert alert-danger" style="display: none;">
+	    <strong>Erro!</strong> Falha ao consultar o servidor
+	</div>
+	<div id="mensagemErro404" class="alert alert-danger" style="display: none;">
+	    <strong>Erro!</strong> Nenhum contrato encontrado
+	</div>
+	<div id="mensagemErro404Item" class="alert alert-danger" style="display: none;">
+	    <strong>Erro!</strong> Nenhuma parcela encontrada
+	</div>
+
+  <form ng-submit="submeterBusca()">
+    <div class="form-group row">
+		<label for="inputEmail3" class="col-sm-1 col-form-label">Nome:</label>
+		<div class="col-sm-8">
+			<input type="text" class="form-control" ng-model="busca_nome_cliente" placeholder="Nome do Cliente">
+		</div>
+    </div>
+    <div class="form-group row">
+   		<div class="col-sm-12">
+			<a class="btn btn-outline-info btn-sm float-right" style="cursor: pointer;" data-toggle="collapse" data-target="#painel_busca_avancada">Busca avançada</a>
+		</div>
+    </div>
+	<hr>
+	<div id="painel_busca_avancada" class="collapse">
+		<div class="form-group row">
+			<label class="col-sm-3">Tipo de contrato:</label>
+			<div class="col-sm-3">
+				<div class="form-check">
+					<label class="form-check-label">
+						<input class="form-check-input" ng-model="busca_filtro_check" type="radio" value="nenhum" checked> Qualquer tipo
+					</label>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="form-check">
+					<label class="form-check-label">
+						<input class="form-check-input" ng-model="busca_filtro_check" type="radio" value="ativo"> Apenas ativos
+					</label>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="form-check">
+		 			<label class="form-check-label">
+						<input class="form-check-input" ng-model="busca_filtro_check" type="radio" value="cancelado"> Apenas os cancelados
+					</label>
+				</div>
+			</div>
+	    </div>
+	    <hr>
+	    <div class="form-group row">
+			<label for="example-date-input" class="col-2 col-form-label">Contrato a vencer entre:</label>
+			<div class="col-5">
+				<input class="form-control" type="date" ng-model="busca_contrato_inicio">
+			</div>
+			<div class="col-5">
+				<input class="form-control" type="date" ng-model="busca_contrato_fim">
+			</div>
+	    </div>
+	</div>
+    <div class="form-group row">
+      <div class="col-sm-12">
+		<button id="bntBuscarCliente" ng-disabled="estadoBuscando" type="submit" class="btn btn-primary float-right" style="cursor: pointer;">
+			Buscar <span class="fa fa-search" aria-hidden="true"></span>
+		</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="container" id="plotBusca" style="display: none;">
+  	<h3>{{nomeClienteSelecionado}}</h3>
+  	  <table class="table table-dark table-hover table-responsive-sm">
+	    <thead>
+	      <tr>
+	        <th>Data Inicial</th>
+	        <th>Vencimento</th>
+	        <th>Ativo</th>
+	        <th>Ações</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="x in contratosBuscados">
+	        <td>{{x.dataInicial | dataBR}}</td>
+	        <td>{{x.dataFinal | dataBR}}</td>
+	        <td><span style="color: {{x.ativo.cor}}; font-size: 20pt;" class="fa fa-{{x.ativo.ico}}"></span></td>
+	        <td>
+	        	<span style="font-size: 20pt;cursor: pointer;" ng-click="editarContrato(x.id)" class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Editar Contrato"></span> - 
+	        	<span style="font-size: 20pt; cursor: pointer;" ng-click="mostrarItens(x.id)" class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="Ver Parcelas"></span>
+	        </td>
+	      </tr>
+	    </tbody>
+	  </table>
+  </div>
+
+  <div class="container" id="plotBuscaClientes" style="display: none;">
+  	<h3>Clientes encontrados</h3>
+  	  <table class="table table-dark table-hover table-responsive-sm">
+	    <thead>
+	      <tr>
+	        <th>Nome do cliente</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="x in clientesBuscados" style="cursor: pointer;">
+	        <td ng-click="submeterBusca(x.id)">{{x.nome}}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+  </div>
+
+  <div class="container" id="plotItens" style="display: none;">
+  	<div class="row">
+  		<div class="col-sm-12">
+  			<h4>{{nomeClienteSelecionado}}</h4>
+  		</div>
+  	</div>
+  	<div class="row">
+  		<div class="col-sm-3">
+  			<b>Total de itens: {{itensTotal}}</b>
+  		</div>
+  		<div class="col-sm-3">
+  			<b>Valor total: {{itensSomaValor | dinheiro}}</b>
+  		</div>
+  		<div class="col-sm-3">
+  			<b>Dívida: {{itensSomaDivida | dinheiro}}</b>
+  		</div>
+   		<div class="col-sm-3">
+  			<b>Parcelas vencidas: {{itensVencidos}}</b>
+  		</div>
+  	</div>
+  	<div class="row">
+  		<div class="col-sm-12">
+  			<button class="bnt btn-success btn-sm float-left" style="cursor: pointer;" ng-click="voltarItens2Contratos()">Voltar</button>
+  			<button class="bnt btn-success btn-sm float-right" style="cursor: pointer;" ng-click="rolarParaBaixo()">Descer</button>
+  		</div>
+  	</div>
+  	<hr>
+  	  <table class="table table-dark table-hover table-responsive-sm">
+	    <thead>
+	      <tr>
+	        <th>Nº</th>
+	        <th>Vencimento</th>
+	        <th>Pagamento</th>
+	        <th>Valor</th>
+	        <th>Desconto</th>
+	        <th>Nota</th>
+	        <th>Observação</th>
+	        <th>Ações</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="x in itensBuscados track by x.idParcelaContrato">
+	        <td data-toggle="tooltip" data-placement="top" title="Número">{{x.numero}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Vencimento"><p style="color: {{x.corVencimento}}">{{x.dataVencimento | dataBR}}</p></td>
+	        <td data-toggle="tooltip" data-placement="top" title="Pagamento">{{x.dataPagamento | dataBR}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Valor R$">{{x.valorBruto | dinheiro}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Deduções">{{x.deducoes | dinheiro}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Nº Nota Fiscal">{{x.notaFiscal}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Observação">{{x.observacao}}</td>
+	        <td>
+	        	<span style="font-size: 15pt;cursor: pointer;" ng-click="editarParcela(x.idParcelaContrato)" class="fa fa-edit"></span>-<span style="font-size: 15pt; cursor: pointer; color: red;" ng-click="deletarParcela(x.idParcelaContrato)" class="fa fa-trash"></span>
+			</td>
+	      </tr>
+	    </tbody>
+	  </table>
+
+	<hr>
+	<div id="mensagemErroEditarItem" class="alert alert-danger" style="display: none;"><strong>Erro!</strong> Verifique os dados preenchidos</div>
+	<div id="mensagemErroEditarItemConexao" class="alert alert-danger" style="display: none;"><strong>Falha na Conexão!</strong> Verifique sua internet</div>
+  	<div class="row">
+  		<div class="col-sm-2">
+			<div class="form-group">
+				<label for="ItemEditNumero">Número:</label>
+				<input class="form-control" type="number" step="1" id="ItemEditNumero" ng-model="itemEditando.numero" />
+			</div>
+  		</div>
+  		<div class="col-sm-3">
+ 			<div class="form-group">
+				<label for="ItemEditDataVencimento">Vencimento:</label>
+				<input class="form-control" type="date" step="1" id="ItemEditDataVencimento" ng-model="itemEditando.dataVencimento" />
+			</div>
+  		</div>
+   		<div class="col-sm-3">
+ 			<div class="form-group">
+				<label for="ItemEditDataPagamento">Pagamento:</label>
+				<input class="form-control" type="date" step="1" id="ItemEditDataPagamento" ng-model="itemEditando.dataPagamento" />
+			</div>
+  		</div>
+  		<div class="col-sm-2">
+			<div class="form-group">
+				<label for="ItemEditValorBruto">Valor: R$</label>
+				<input class="form-control" type="number" step="0.01" id="ItemEditValorBruto" ng-model="itemEditando.valorBruto" />
+			</div>
+  		</div>
+  		<div class="col-sm-2">
+			<div class="form-group">
+				<label for="ItemEditDeducoes">Deduções: R$</label>
+				<input class="form-control" type="number" step="0.01" id="ItemEditDeducoes" ng-model="itemEditando.deducoes" />
+			</div>
+  		</div>
+  	</div>
+
+  	<div class="row">
+   		<div class="col-sm-2">
+			<div class="form-group">
+				<label for="ItemEditNotaFiscal">Nota Fiscal:</label>
+				<input class="form-control" type="number" step="1" id="ItemEditNotaFiscal" ng-model="itemEditando.notaFiscal" />
+			</div>
+  		</div>
+  		<div class="col-sm-8">
+			<div class="form-group">
+				<label for="ItemEditObservacoes">Observacoes:</label>
+				<textarea class="form-control" rows="2" id="ItemEditObservacoes" ng-model="itemEditando.observacao"></textarea>
+			</div>
+  		</div>
+  		<div class="col-sm-2">
+ 			<button class="btn btn-success" style="cursor: pointer; margin-top: 50px;" ng-click="itemEditando={func: 'Criar', Processando: false};">Limpar</button>
+  			<button class="btn btn-primary" style="cursor: pointer; margin-top: 50px;" ng-click="consolidarItemEditando()" ng-disabled="itemEditando.Processando">{{itemEditando.func}}</button>
+  		</div>
+  	</div>
+
+  	<hr>
+
+  	<div class="row">
+  		<div class="col-sm-12">
+  			<button class="bnt btn-success btn-sm float-right" style="cursor: pointer;" ng-click="rolarParaCima()">Subir</button>
+  		</div>
+  	</div>
+  </div>
+
+</div>
+<!--Fim da tela de busca por contratos-->
+
+<!--Inicio da tela de edição de contrato-->
+<div class="modal fade" id="tela_edicao">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Contrato</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+			<div class="form-group row" id="telaEdicao_mensagemAtualizar" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-danger">
+					    <strong>Erro!</strong> Problema ao atualizar o contrato
+					</div>
+				</div>
+			</div>
+			<div class="form-group row" id="telaEdicao_mensagemConexao" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-danger">
+					    <strong>Erro!</strong> Falha na conexão com o servidor
+					</div>
+				</div>
+			</div>
+			<div class="form-group row" id="telaEdicao_mensagemSucesso" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-success">
+					    <strong>Sucesso!</strong> O contrato foi atualizado
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<label for="telaEdicao_nome_cliente" class="col-2 col-form-label">Cliente</label>
+				<div class="col-8">
+					<select class="custom-select" id="telaEdicao_nome_cliente">
+						<option ng-repeat="x in cache.listaClientes" value="{{x.id}}">{{x.nome}}</option>
+					</select>
+				</div>
+				<div class="col-2">
+					<div class="form-check">
+						<label class="form-check-label">
+						<input type="checkbox" class="form-check-input" ng-model="contratoSelecionado.ativo" id="telaEdicao_ehAtivo">Ativo</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group row">
+			  <label for="telaEdicao_data_emissao" class="col-2 col-form-label">Emissão:</label>
+			  <div class="col-4">
+			    <input class="form-control" type="date" id="telaEdicao_data_emissao" ng-model="contratoSelecionado.dataEmissao">
+			  </div>
+			  <label for="telaEdicao_data_inicio" class="col-2 col-form-label">Início:</label>
+			  <div class="col-4">
+			    <input class="form-control" type="date" id="telaEdicao_data_inicio" ng-model="contratoSelecionado.dataInicial">
+			  </div>
+			</div>
+			<div class="form-group row">
+			  <label for="telaEdicao_data_vencimento" class="col-2 col-form-label">Vencimento:</label>
+			  <div class="col-4">
+			    <input class="form-control" type="date" id="telaEdicao_data_vencimento" ng-model="contratoSelecionado.dataFinal">
+			  </div>
+			  <label for="telaEdicao_data_cancelamento" class="col-2 col-form-label">Cancelado:</label>
+			  <div class="col-4">
+			    <input class="form-control" type="date" id="telaEdicao_data_cancelamento" ng-model="contratoSelecionado.dataCancelamento">
+			  </div>
+			</div>
+			<div class="form-group row">
+				<label for="telaEdicao_categoria" class="col-2 col-form-label">Categoria:</label>
+				<div class="col-10">
+					<select class="custom-select" id="telaEdicao_categoria">
+						<option ng-repeat="x in cache.listaCategoriasProduto" value="{{x.id}}">{{x.nome}}</option>
+					</select>
+				</div>
+			</div>
+          	<div class="form-group row">
+			    <label for="telaEdicao_servico" class="col-2 col-form-label">Serviços:</label>
+			    <div class="col-10">
+				    <select multiple class="form-control" id="telaEdicao_servico" style="height: {{cache.listaProdutos.length*17}}pt;">
+				      <option ng-repeat="x in cache.listaProdutos" value="{{x.id}}">{{x.nome}}</option>
+				    </select>
+			    </div>
+			</div>
+          	<div class="form-group row">
+			  <div class="col-3 offset-3" data-toggle="tooltip" data-placement="top" title="Responsável">
+			    <select class="custom-select" id="telaEdicao_funcionario">
+					<option ng-repeat="x in cache.listaFuncionarios" value="{{x.id}}">{{x.nome}}</option>
+				</select>
+			  </div>
+			  <div class="col-3" data-toggle="tooltip" data-placement="top" title="Mensageiro">
+			    <select class="custom-select" id="telaEdicao_mensageiro">
+					<option ng-repeat="x in cache.listaMensageiros" value="{{x.id}}">{{x.nome}}</option>
+				</select>
+			  </div>
+			  <div class="col-3" data-toggle="tooltip" data-placement="top" title="Tipo de Acesso">
+			    <select class="custom-select" id="telaEdicao_tipoAcesso">
+					<option ng-repeat="x in cache.listaTipoAcesso" value="{{x.id}}">{{x.nome}}</option>
+				</select>
+			  </div>
+			</div>
+			<div class="form-group row">
+			  <label for="telaEdicao_valor_total" class="col-2 col-form-label">Valor Total:</label>
+			  <div class="col-4">
+			    <input class="form-control" type="text" ng-model="contratoSelecionado.valorTotal" id="telaEdicao_valor_total">
+			  </div>
+			 </div>
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">Utilizado:</label>
+			  <div class="col-4">
+			    <input class="form-control" type="text" value="{{contratoSelecionado.valorUtilizado | dinheiro}}" disabled>
+			  </div>
+			  <label class="col-2 col-form-label">Disponível:</label>
+			  <div class="col-4">
+			    <input class="form-control" type="text" value="{{contratoSelecionado.saldoDisponivel | dinheiro}}" disabled>
+			  </div>
+			</div>
+			<div class="form-group row">
+				<label for="telaEdicao_observacao" class="col-2 col-form-label">Observação: </label>
+				<div class="col-10">
+					<textarea class="form-control" id="telaEdicao_observacao" ng-model="contratoSelecionado.observacao" rows="5"></textarea>
+				</div>
+			</div>
+		</div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" style="display: block; margin-right: auto;cursor: pointer;" ID="bnt_deletar_contrato" ng-click="deletarContrato()">Deletar <span class="fa fa-trash"></span></button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" style="cursor: pointer;">Close</button>
+          <button type="button" class="btn btn-primary" ID="bnt_atualizar_contrato" ng-disabled="estadoAtualizando" ng-click="atualizarContrato()" style="cursor: pointer;">Atualizar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>
+<!--Fim da tela de edição de contratos-->
+
+<!--Inicio da tela de criação de contrato-->
+<div class="container-fluid" id="tela_criacao" style="display: none;">
+  <form ng-submit="criarContrato()">
+	<div class="form-group row">
+		<label for="telaCriacao_nome_cliente" class="col-2 col-form-label">Cliente:</label>
+		<div class="col-8">
+			<select class="custom-select" id="telaCriacao_nome_cliente">
+				<option ng-repeat="x in cache.listaClientes" value="{{x.id}}">{{x.nome}}</option>
+			</select>
+		</div>
+		<div class="col-2">
+			<div class="form-check">
+				<label class="form-check-label">
+				<input type="checkbox" class="form-check-input" ng-model="contratoCriando.ativo">Ativo</label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group row">
+	  <label for="telaCriacao_data_emissao" class="col-2 col-form-label">Emissão:</label>
+	  <div class="col-4">
+	    <input class="form-control" type="date" id="telaCriacao_data_emissao" ng-model="contratoCriando.dataEmissao">
+	  </div>
+	  <label for="telaCriacao_data_inicio" class="col-2 col-form-label">Início:</label>
+	  <div class="col-4">
+	    <input class="form-control" type="date" id="telaCriacao_data_inicio" ng-model="contratoCriando.dataInicial">
+	  </div>
+	</div>
+	<div class="form-group row">
+	  <label for="telaCriacao_data_vencimento" class="col-2 col-form-label">Vencimento:</label>
+	  <div class="col-4">
+	    <input class="form-control" type="date" id="telaCriacao_data_vencimento" ng-model="contratoCriando.dataFinal">
+	  </div>
+	  <label for="telaCriacao_data_cancelamento" class="col-2 col-form-label">Cancelado:</label>
+	  <div class="col-4">
+	    <input class="form-control" type="date" id="telaCriacao_data_cancelamento" ng-model="contratoCriando.dataCancelamento">
+	  </div>
+	</div>
+	<div class="form-group row">
+		<label for="telaCriacao_categoria" class="col-2 col-form-label">Categoria:</label>
+		<div class="col-4">
+			<select class="custom-select" id="telaCriacao_categoria">
+				<option ng-repeat="x in cache.listaCategoriasProduto" value="{{x.id}}">{{x.nome}}</option>
+			</select>
+		</div>
+	  <label for="telaCriacao_valor_total" class="col-2 col-form-label">Valor Total:</label>
+	  <div class="col-4">
+	    <input class="form-control" type="number" step="0.01" ng-model="contratoCriando.valorTotal" id="telaCriacao_valor_total">
+	  </div>
+	</div>
+         <div class="form-group row">
+	    <label for="telaCriacao_servico" class="col-2 col-form-label">Serviços:</label>
+	    <div class="col-10">
+		    <select multiple class="form-control" id="telaCriacao_servico" style="height: {{cache.listaProdutos.length*17}}pt;">
+		      <option ng-repeat="x in cache.listaProdutos" value="{{x.id}}">{{x.nome}}</option>
+		    </select>
+	    </div>
+	</div>
+     <div class="form-group row">
+      <label class="col-2">Responsável:</label>
+	  <div class="col-2">
+	    <select class="custom-select" id="telaCriacao_funcionario" class="float-left">
+			<option ng-repeat="x in cache.listaFuncionarios" value="{{x.id}}">{{x.nome}}</option>
+		</select>
+	  </div>
+	  <label class="col-2">Mensageiro:</label>
+	  <div class="col-2">
+	    <select class="custom-select" id="telaCriacao_mensageiro" class="float-left">
+			<option ng-repeat="x in cache.listaMensageiros" value="{{x.id}}">{{x.nome}}</option>
+		</select>
+	  </div>
+	  <label class="col-2">Tipo de Acesso:</label>
+	  <div class="col-2">
+	    <select class="custom-select" id="telaCriacao_tipoAcesso" class="float-left">
+			<option ng-repeat="x in cache.listaTipoAcesso" value="{{x.id}}">{{x.nome}}</option>
+		</select>
+	  </div>
+	</div>
+	<div class="form-group row">
+		<label for="telaCriacao_observacao" class="col-2 col-form-label">Observação: </label>
+		<div class="col-10">
+			<textarea class="form-control" id="telaCriacao_observacao" ng-model="contratoCriando.observacao" rows="5"></textarea>
+		</div>
+	</div>
+	<hr>
+	<div class="form-group row">
+		<div class="col-10">
+			<div class="alert alert-danger" id='mensagemErroCriar' style="display: none; text-align: center;">
+				<strong>Erro!</strong> Falha ao criar o contrato
+			</div>
+			<div class="alert alert-danger" id='mensagemErroCriar_con' style="display: none; text-align: center;">
+				<strong>Erro!</strong> Falha na conexão com o servidor
+			</div>
+			<div class="alert alert-success" id='mensagemSucessoCriar' style="display: none; text-align: center;">
+				<strong>Sucesso!</strong> Contrato criado
+			</div>
+		</div>
+		<div class="col-2">
+			<button type="submit" class="btn btn-primary" ID="bnt_criar_contrato" ng-disabled="estadoCriando" style="cursor: pointer;">Criar Contrato</button>
+		</div>
+	</div>
+  </form>
+</div>
+<!--Fim da tela de criação de contratos-->
+
+<div id='telaErroFatal' style="z-index: 99999; display: none; width: 100%; height: 100%; background-color: #f2f2f2; position: absolute; top: 0; left: 0; text-align: center; opacity: 0.9;">
+	<h1 style="font-size: 5vmax; position: relative; top: 4vmax; color: rgb(173,14,10);">Falha ao carregar os dados</h1>
+	<h2 style="font-size: 3vmax; position: relative; top: 4vmax; color: rgb(173,14,10);">Verifique sua conexão ou o log de erros do servidor</h2>
+	<h4 style="font-size: 2vmax; position: relative; top: 4vmax; color: black;" id="telaErroFatalMensagem"></h4>
+</div>
+</div>

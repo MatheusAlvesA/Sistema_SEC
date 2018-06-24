@@ -1,0 +1,19 @@
+{
+    "name": "Sistema SEC Publicidade",
+    "description": "Este sistema fornece acesso, manutenção e gerencia em geral dos dados da SEC Publicidade",
+    "authors": [
+        {
+            "name": "Matheus Alves de Andrade  ",
+            "email": "matheuseejam@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+                "Persistencia\\": "libs/persistencia/",
+                "Sistema\\": "libs/sistema/"
+        }
+    }
+}

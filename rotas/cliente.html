@@ -1,0 +1,404 @@
+<div ng-controller="ClienteCtrl">
+
+<ul class="nav nav-pills nav-justified">
+  <li class="nav-item" onclick="trocarTelaClientes(1)">
+    <a class="nav-link active" id="bnt_tela_busca" href="">Buscar Cliente <span class="fa fa-search" aria-hidden="true"></span></a>
+  </li>
+  <li class="nav-item" onclick="trocarTelaClientes(2)">
+    <a class="nav-link" id="bnt_tela_criacao" href="">Cadastrar Cliente <span class="fa fa-clipboard" aria-hidden="true"></span></a>
+  </li>
+</ul>
+
+<hr>
+
+<div class="container-fluid" id="tela_busca">
+
+	<div id="mensagemErroConexao" class="alert alert-danger" style="display: none;">
+	    <strong>Erro!</strong> Falha na conexão com o servidor
+	</div>
+	<div id="mensagemErroConsultar" class="alert alert-danger" style="display: none;">
+	    <strong>Erro!</strong> Falha ao consultar o servidor
+	</div>
+	<div id="mensagemErro404" class="alert alert-danger" style="display: none;">
+	    <strong>Erro!</strong> Nenhum cliente encontrado
+	</div>
+
+  <form ng-submit="submeterBusca()">
+    <div class="form-group row">
+		<label class="col-sm-1 col-form-label">Nome:</label>
+		<div class="col-sm-8">
+			<input type="text" class="form-control" ng-model="busca_nome_cliente" placeholder="Nome do Cliente">
+		</div>
+     	<div class="col-sm-3">
+			<button id="bntBuscarCliente" ng-disabled="estadoBuscando" type="submit" class="btn btn-primary" style="cursor: pointer;">
+			Buscar <span class="fa fa-search" aria-hidden="true"></span>
+			</button>
+    	</div>
+    </div>
+  </form>
+<hr>
+
+  <div class="container" id="plotBuscaClientes" style="display: none;">
+  	<h3>Clientes encontrados</h3>
+  	  <table class="table table-dark table-hover table-responsive-sm">
+	    <thead>
+	      <tr>
+	        <th>Nome do cliente</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="x in clientesBuscados" style="cursor: pointer;">
+	        <td ng-click="editarCliente(x.idCliente)">{{x.nomeCliente}}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+  </div>
+
+</div>
+<!--Fim da tela de busca por clientes-->
+
+<!--Inicio da tela de edição de clientes-->
+<div class="modal fade" id="tela_edicao">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Cliente</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+			<div class="form-group row">
+				<label for="telaEdicao_nome_cliente" class="col-2 col-form-label">Nome</label>
+				<div class="col-8">
+					<input type="text" class="form-control" ng-model="clienteSelecionado.nomeCliente" placeholder="Nome do Cliente">
+				</div>
+				<div class="col-2">
+					<div class="form-check">
+						<input type="checkbox" class="form-check-input" id="checkEhAtivo" ng-model="clienteSelecionado.ativo">
+						<label class="form-check-label" for="checkEhAtivo">Ativo</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">Logradouro:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.logradouro" placeholder="Logradouro">
+			  </div>
+			  <label class="col-2 col-form-label">Bairro:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.bairro" placeholder="Bairro">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">CEP:</label>
+			  <div class="col-3">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.cep" placeholder="CEP">
+			  </div>
+			  <label class="col-1 col-form-label">Cidade:</label>
+			  <div class="col-3">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.cidade" placeholder="Cidade">
+			  </div>
+			  <label class="col-1 col-form-label">UF:</label>
+			  <div class="col-2">
+			    	<select class="custom-select" id="telaEdicao_UF">
+						<option ng-repeat="x in cache.listaUFs" value="{{x.UF}}">{{x.UF}}</option>
+					</select>
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">Celular:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.celular" placeholder="Celular">
+			  </div>
+			  <label class="col-2 col-form-label">Telefone:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.telefone" placeholder="Telefone">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">Fax:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.fax" placeholder="Fax">
+			  </div>
+			  <label class="col-2 col-form-label">E-Mail:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.email" placeholder="Email">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">Homepage:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.homepage" placeholder="Homepage">
+			  </div>
+			  <label class="col-2 col-form-label">Titular:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.titular" placeholder="Titular">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">Contato:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.contato" placeholder="Contato">
+			  </div>
+			  <label class="col-2 col-form-label">CGC/CPF:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.cgcCpf" placeholder="CGC/CPF">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">Insc. Estadual:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.inscEstadual" placeholder="Inscrição Estadual">
+			  </div>
+			  <label class="col-2 col-form-label">Insc. Municipal:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.inscMunicipal" placeholder="Inscrição Municipal">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+			  <label class="col-2 col-form-label">CPF do Titular:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.titularCpf" placeholder="CPF do Titular">
+			  </div>
+			  <label class="col-2 col-form-label">Complemento:</label>
+			  <div class="col-4">
+			    <input type="text" class="form-control" ng-model="clienteSelecionado.complemento" placeholder="Complemento">
+			  </div>
+			</div>
+
+			<div class="form-group row">
+				<label for="telaEdicao_observacao" class="col-2 col-form-label">Observação: </label>
+				<div class="col-10">
+					<textarea class="form-control" id="telaEdicao_observacao" ng-model="clienteSelecionado.observacao" rows="5"></textarea>
+				</div>
+			</div>
+
+			<div class="row" id="telaEdicao_mensagemAtualizar" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-danger">
+					    <strong>Erro!</strong> Problema ao atualizar o cliente
+					</div>
+				</div>
+			</div>
+			<div class="row" id="telaEdicao_mensagemDeletar" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-danger">
+					    <strong>Erro!</strong> O cliente pode estar associado a algum contrato
+					</div>
+				</div>
+			</div>
+			<div class="row" id="telaEdicao_mensagemErroDesconhecido" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-danger">
+					    <strong>Erro!</strong> O servidor parece estar com problemas
+					</div>
+				</div>
+			</div>
+			<div class="row" id="telaEdicao_mensagemConexao" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-danger">
+					    <strong>Erro!</strong> Falha na conexão com o servidor
+					</div>
+				</div>
+			</div>
+			<div class="row" id="telaEdicao_mensagemSucesso" style="display: none;">
+				<div class="col-8">
+					<div class="alert alert-success">
+					    <strong>Sucesso!</strong> O cliente foi atualizado
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" style="display: block; margin-right: auto;cursor: pointer;" ng-click="deletarCliente()">Deletar <span class="fa fa-trash"></span></button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" style="cursor: pointer;">Close</button>
+          <button type="button" class="btn btn-primary" ID="bnt_atualizar_cliente" ng-disabled="estadoAtualizando" ng-click="atualizarCliente()" style="cursor: pointer;">Atualizar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>
+<!--Fim da tela de edição de clientes-->
+
+<!--Inicio da tela de criação de cliente-->
+<div class="container-fluid" id="tela_criacao" style="display: none;">
+  <form ng-submit="criarCliente()">
+        <h4>Novo Cliente</h4>
+		<div class="form-group row">
+			<label for="telaEdicao_nome_cliente" class="col-2 col-form-label">Nome</label>
+			<div class="col-8">
+				<input type="text" class="form-control" ng-model="clienteCriando.nomeCliente" placeholder="Nome do Cliente">
+			</div>
+			<div class="col-2">
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" id="checkEhAtivo" ng-model="clienteCriando.ativo">
+					<label class="form-check-label" for="checkEhAtivo">Ativo</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">Logradouro:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.logradouro" placeholder="Logradouro">
+		  </div>
+		  <label class="col-2 col-form-label">Bairro:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.bairro" placeholder="Bairro">
+		  </div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">CEP:</label>
+		  <div class="col-3">
+		    <input type="text" class="form-control" ng-model="clienteCriando.cep" placeholder="CEP">
+		  </div>
+		  <label class="col-1 col-form-label">Cidade:</label>
+		  <div class="col-3">
+		    <input type="text" class="form-control" ng-model="clienteCriando.cidade" placeholder="Cidade">
+		  </div>
+		  <label class="col-1 col-form-label">UF:</label>
+		  <div class="col-2">
+		    	<select class="custom-select" id="telaCriacao_UF">
+					<option ng-repeat="x in cache.listaUFs" value="{{x.UF}}">{{x.UF}}</option>
+				</select>
+		  </div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">Celular:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.celular" placeholder="Celular">
+		  </div>
+		  <label class="col-2 col-form-label">Telefone:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.telefone" placeholder="Telefone">
+		  </div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">Fax:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.fax" placeholder="Fax">
+		  </div>
+		  <label class="col-2 col-form-label">E-Mail:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.email" placeholder="Email">
+		  </div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">Homepage:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.homepage" placeholder="Homepage">
+		  </div>
+		  <label class="col-2 col-form-label">Titular:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.titular" placeholder="Titular">
+		  </div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">Contato:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.contato" placeholder="Contato">
+		  </div>
+		  <label class="col-2 col-form-label">CGC/CPF:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.cgcCpf" placeholder="CGC/CPF">
+		  </div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">Insc. Estadual:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.inscEstadual" placeholder="Inscrição Estadual">
+		  </div>
+		  <label class="col-2 col-form-label">Insc. Municipal:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.inscMunicipal" placeholder="Inscrição Municipal">
+		  </div>
+		</div>
+
+		<div class="form-group row">
+		  <label class="col-2 col-form-label">CPF do Titular:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.titularCpf" placeholder="CPF do Titular">
+		  </div>
+		  <label class="col-2 col-form-label">Complemento:</label>
+		  <div class="col-4">
+		    <input type="text" class="form-control" ng-model="clienteCriando.complemento" placeholder="Complemento">
+		  </div>
+		</div>
+
+		<div class="form-group row">
+			<label for="telaEdicao_observacao" class="col-2 col-form-label">Observação: </label>
+			<div class="col-10">
+				<textarea class="form-control" id="telaEdicao_observacao" ng-model="clienteCriando.observacao" rows="5"></textarea>
+			</div>
+		</div>
+
+		<div class="row" id="telaCriacao_mensagemCriar" style="display: none;">
+			<div class="col-8">
+				<div class="alert alert-danger">
+				    <strong>Erro!</strong> Problema ao criar o cliente
+				</div>
+			</div>
+		</div>
+
+		<div class="row" id="telaCriacao_mensagemErroDesconhecido" style="display: none;">
+			<div class="col-8">
+				<div class="alert alert-danger">
+				    <strong>Erro!</strong> O servidor parece estar com problemas
+				</div>
+			</div>
+		</div>
+
+		<div class="row" id="telaCriacao_mensagemConexao" style="display: none;">
+			<div class="col-8">
+				<div class="alert alert-danger">
+				    <strong>Erro!</strong> Falha na conexão com o servidor
+				</div>
+			</div>
+		</div>
+
+		<div class="row" id="telaCriacao_mensagemSucesso" style="display: none;">
+			<div class="col-8">
+				<div class="alert alert-success">
+				    <strong>Sucesso!</strong> O cliente foi criado
+				</div>
+			</div>
+		</div>
+
+        <!-- Modal footer -->
+        <div class="row">
+        	<div class="col-12">
+        		<button type="submit" class="btn btn-primary float-right" ng-disabled="estadoCriando" id='bnt_criar_cliente' style="cursor: pointer;">Criar</button>
+        	</div>
+        </div>
+
+  </form>
+  <hr>
+</div>
+<!--Fim da tela de criação de contratos-->
+
+<div id='telaErroFatal' style="z-index: 99999; display: none; width: 100%; height: 100%; background-color: #f2f2f2; position: absolute; top: 0; left: 0; text-align: center; opacity: 0.9;">
+	<h1 style="font-size: 5vmax; position: relative; top: 4vmax; color: rgb(173,14,10);">Falha ao carregar os dados</h1>
+	<h2 style="font-size: 3vmax; position: relative; top: 4vmax; color: rgb(173,14,10);">Verifique sua conexão ou o log de erros do servidor</h2>
+	<h4 style="font-size: 2vmax; position: relative; top: 4vmax; color: black;" id="telaErroFatalMensagem"></h4>
+</div>
+</div>

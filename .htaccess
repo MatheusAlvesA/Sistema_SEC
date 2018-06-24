@@ -1,0 +1,16 @@
+ErrorDocument 404 /404.html
+ErrorDocument 403 /403.html
+
+SetEnv TZ "America/Sao_Paulo"
+
+Options -Indexes
+
+<FilesMatch "\.(txt|json|lock|log)$" >
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+#Comente as linhas abaixo caso o servidor não dê suporte a https
+#RewriteEngine On
+#RewriteCond %{HTTPS} off
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
