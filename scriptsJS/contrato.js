@@ -882,6 +882,7 @@ _________________________________________________________________*/
         'id': $scope.itemEditando.idParcelaContrato,
         'parametros': item
       };
+      $scope.itemEditando = {func: 'Salvar'};
     }
 
     $scope.itemEditando.Processando = true;
