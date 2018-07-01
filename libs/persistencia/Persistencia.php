@@ -539,6 +539,38 @@ class Persistencia {
 								$this);
 	}
 
+	public function getItensUltimos12Meses(): Array {
+		$consulta = $this->con->prepare('SELECT * FROM parcelacontrato WHERE 
+	        	(`datepagamento` IS NOT NULL
+	            AND (`datepagamento` >= DATE("'.(date('Y')-1).'-'.(date('m')).'-01"))
+	            )'); // preparando
+		$consulta->execute(); // executando em cima do id do contrato
+
+		$rs = $consulta->fetchAll(); //extraindo o vetor corespondente ao resultado
+		if(count($rs) <= 0) {
+			$e = new PersistenciaException("Nenhum item de contrato encontrato");
+			$e->setEstado( 'ID: '.$id.', PDOStatement::errorInfo: '.json_encode( $consulta->errorInfo() ) );
+			throw $e;
+		}
+
+		$retorno = [];
+		foreach ($rs as $chave => $valor) {
+			array_push($retorno, new ItemContrato((int) $valor['idparcelaContrato'],
+								(int) $valor['idcontrato'],
+								(float) $valor['valorbruto'],
+								utf8_encode($valor['datavencimento']),
+								utf8_encode($valor['datepagamento']),
+								(float) $valor['deducoes'],
+								utf8_encode($valor['notafiscal']),
+								utf8_encode($valor['observacao']),
+								(bool) $valor['foipaga'],
+								(float) $valor['numero'],
+								$this));
+		}
+
+		return $retorno;
+	}
+
 	/*
 		Esta função executa uma atualização de um valor desejado em uma determinada coluna de uma determinada tabela
 		$tabela Deve conter a tabela a ser atualizada
@@ -897,6 +929,9 @@ class Persistencia {
 			break;
 			case (Relatorio::INADIMPLENTES):
 				return $this->listarDadosClientesEmAtraso();
+			break;
+			case (Relatorio::itensPagosNosUltimos12Meses):
+				return $this->getItensUltimos12Meses();
 			break;
 
 			default:

@@ -722,7 +722,20 @@ $scope.criarContrato = function() {
   ####### SUBSISTEMA CRIAÇÃO E EDIÇÃO DE ITENS DE CONTRATO #######
 _________________________________________________________________*/
   $scope.itemEditando = {}; // O item que estiver sendo editado será guardado aqui temporariamente.
+  $scope.eventListenerInserirItem = false; // O gatilho de da tecla enter ainda não foi criado
   $scope.mostrarItens = function(idContrato) {
+
+    /*
+      Adicionando listener de evento para inserir apertando enter
+    */
+    if(!$scope.eventListenerInserirItem) {
+      $('#ItemEditObservacoes').bind('keyup', (e) => {
+        if(e.key == 'Enter')
+          $scope.consolidarItemEditando();
+      });
+      $scope.eventListenerInserirItem = true; //Garantindo que não executará esse trecho mais de uma vez
+    }
+
     var retorno = null;
     $scope.idContratoDosItens = idContrato;
 
@@ -859,6 +872,8 @@ _________________________________________________________________*/
         'alvo': 'item',
         'parametros': item
       };
+      $scope.itensBuscados.push(item); // Se adiantando e inserindo o item logo
+      $scope.itemEditando = {func: 'Criar'};
     }
     else { // Atualizar um item existente de contrato
       comando = {
@@ -869,13 +884,12 @@ _________________________________________________________________*/
       };
     }
 
-    let backupFunc = $scope.itemEditando.func;
-    $scope.itemEditando.func = '...';
     $scope.itemEditando.Processando = true;
+    $('#ItemEditValorBruto').focus();
     requisitarAPI.post(comando,
         function(dados) { //callback de sucesso
-          $scope.itemEditando.func = backupFunc; // Retornando a função anterior
           $scope.itemEditando.Processando = false; // Não está mais processando essa requisição
+          $scope.mostrarItens($scope.idContratoDosItens);
 
           if(dados.status !== 200 || typeof dados.data === 'string') { // erro desconhecido do servidor
             mensagemERRO.editarItem();
@@ -886,16 +900,14 @@ _________________________________________________________________*/
             return false;
           }
           else { // sucesso
-            $scope.itemEditando = {};
-            $scope.mostrarItens($scope.idContratoDosItens);
             return true;
           }
         },
         function(dados) { // callback de falha
-          $scope.itemEditando.func = backupFunc; // Retornando a função anterior
           $scope.itemEditando.Processando = false; // Não está mais processando essa requisição
 
           mensagemERRO.editarItemConexao();
+          $scope.mostrarItens($scope.idContratoDosItens);
           return false;
         }
     );

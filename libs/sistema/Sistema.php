@@ -185,6 +185,98 @@ class Sistema {
 		return $acumulador;
 	}
 
+	public function listarServicosFinalizadosUltimos12Meses() { //todo
+		try {
+			$r = $this->persistencia->getRelatorio(Relatorio::itensPagosNosUltimos12Meses);
+		} catch (PersistenciaException $e) {
+			Logger::logar($e);
+			return [ 'nServicos' => [], 'valorServicos' => [] ];
+		}
+		// Processando dados
+		usort($r, function($a, $b) {
+			$dataA = explode('-', $a->getDataPagamento());
+			$dataB = explode('-', $b->getDataPagamento());
+
+			if($dataA[0] < $dataB[0]) return -1;
+			if($dataA[0] > $dataB[0]) return  1;
+
+			if($dataA[1] < $dataB[1]) return -1;
+			if($dataA[1] > $dataB[1]) return  1;
+
+			if($dataA[2] < $dataB[2]) return -1;
+			if($dataA[2] > $dataB[2]) return  1;
+
+			return 0;
+		});
+
+		$nServicos = [];
+		$valorServicos = [];
+		foreach ($r as $chave => $item) {
+			$nMes = (int) explode('-', $item->getDataPagamento())[1];
+			$mes = $this->int2Mes( $nMes );
+
+			if(array_key_exists($mes, $nServicos))
+				$nServicos[$mes] += 1;
+			else
+				$nServicos[$mes] = 1;
+
+			if(array_key_exists($mes, $valorServicos))
+				$valorServicos[$mes] += round($item->getValorBruto()-$item->getDeducoes());
+			else
+				$valorServicos[$mes] = round($item->getValorBruto()-$item->getDeducoes());
+		}
+
+		return [
+			'nServicos' => $nServicos,
+			'valorServicos' => $valorServicos
+		];
+	}
+	// Esta função recebe um inteiro de 1 até 12 e retorna o mês respectivo em 3 letas
+	private function int2Mes(int $m): string {
+		switch ($m) {
+			case 1:
+				return 'JAN';
+				break;
+			case 2:
+				return 'FEV';
+				break;
+			case 3:
+				return 'MAR';
+				break;
+			case 4:
+				return 'ABR';
+				break;
+			case 5:
+				return 'MAI';
+				break;
+			case 6:
+				return 'JUN';
+				break;
+			case 7:
+				return 'JUL';
+				break;
+			case 8:
+				return 'AGO';
+				break;
+			case 9:
+				return 'SET';
+				break;
+			case 10:
+				return 'OUT';
+				break;
+			case 11:
+				return 'NOV';
+				break;
+			case 12:
+				return 'DEZ';
+				break;
+
+			default:
+				return 'ERRO';
+				break;
+		}
+	}
+
 	public function criarContrato(bool $ativo,
 		$dataCancelamento, // esse elemento pode ser string ou nulo
 		string $dataEmissao,

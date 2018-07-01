@@ -40,6 +40,9 @@
       })
       .when("/relatorioClientesInativos", {
           templateUrl : "rotas/relatorioClientesInativos.html"
+      })
+      .when("/relatorioGraficos", {
+          templateUrl : "rotas/relatorioGraficos.html"
       });
   });
 
@@ -120,7 +123,7 @@ app.filter('dinheiro', function() {
 
 app.filter('dataBR', function() {
     return function(valor) {
-        if(valor === undefined || valor === null) return '';
+        if(valor === undefined || valor === null || typeof valor != 'string') return '';
         return valor.split('-').reverse().join('/');
     };
 });

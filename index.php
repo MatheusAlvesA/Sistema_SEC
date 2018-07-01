@@ -41,6 +41,8 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
   ';
 }
 ?>
+  <!-- Este Script deve vir do CDN do Google -->
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 <body ng-app="App">
@@ -90,6 +92,7 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
       <div class="list-group">
         <b class="list-group-item list-group-item-light" data-toggle="collapse" data-target="#painelRelatorios">Relatórios</b>
         <div id="painelRelatorios">
+          <a href="#!relatorioGraficos" class="list-group-item list-group-item-dark">Gráficos</a>
           <a href="#!relatorioClientes" class="list-group-item list-group-item-dark">Clientes</a>
           <a href="#!relatorioClientesAtrasados" class="list-group-item list-group-item-dark">Clientes atrasados</a>
           <a href="#!relatorioClientesAtivos" class="list-group-item list-group-item-dark">Clientes ativos</a>
@@ -132,6 +135,7 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
 <script type="text/javascript" src="scriptsJS/relatorioClientesAtrasados.js"></script>
 <script type="text/javascript" src="scriptsJS/relatorioClientesAtivos.js"></script>
 <script type="text/javascript" src="scriptsJS/relatorioClientesInativos.js"></script>
+<script type="text/javascript" src="scriptsJS/relatorioGraficos.js"></script>
 
 </body>
 </html>

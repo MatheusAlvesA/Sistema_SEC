@@ -375,18 +375,35 @@ function criar($request) {
 function relatorio($request) {
 	global $sistema;
 
-	if($request['alvo'] === 'Email')
-		echo json_encode($sistema->listarEmails());
-	elseif($request['alvo'] === 'Clientes')
-		echo json_encode($sistema->listarClientes());
-	elseif($request['alvo'] === 'ClientesAtivos')
-		echo json_encode($sistema->listarClientesAtivos());
-	elseif($request['alvo'] === 'ClientesInativos')
-		echo json_encode($sistema->listarClientesInativos());
-	elseif($request['alvo'] === 'ClientesInadimplentes')
-		echo json_encode($sistema->listarClientesEmAtraso());
-	else
-		echo '{"status": "falha", "mensagem": "Alvo desconhecido para o comando relatorio"}';
+	switch ($request['alvo']) {
+		case 'Email':
+			echo json_encode($sistema->listarEmails());
+			break;
+		case 'Clientes':
+			echo json_encode($sistema->listarClientes());
+			break;
+
+		case 'ClientesAtivos':
+			echo json_encode($sistema->listarClientesAtivos());
+			break;
+
+		case 'ClientesInativos':
+			echo json_encode($sistema->listarClientesInativos());
+			break;
+
+		case 'ClientesInadimplentes':
+			echo json_encode($sistema->listarClientesEmAtraso());
+			break;
+
+		case 'servicosFinalizadosUltimos12Meses':
+			echo json_encode($sistema->listarServicosFinalizadosUltimos12Meses());
+			break;
+
+		default:
+			echo '{"status": "falha", "mensagem": "Alvo desconhecido para o comando relatorio"}';
+			break;
+	}
+		
 }
 
 /**********************************************************************************

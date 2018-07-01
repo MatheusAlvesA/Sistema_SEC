@@ -1,0 +1,36 @@
+<div ng-controller="GraficosCtrl">
+
+<div class="container-fluid" id="tela_principal">
+	<div class="row" id='containerMensagemErro'>
+		<div class="col-12">
+				<div id="mensagemErroConexao" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> Falha na conexão com o servidor, verifique sua internet
+				</div>
+				<div id="mensagemErroDesconhecido" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> O servidor parece estar com problema
+				</div>
+		</div>
+	</div>
+  <div class="container-fluid" id='plotDados'>
+	<div class="row">
+		<div class="col-11">
+			<img src="imgs/logo.png" alt="logo" style="width:40px; float: left;">
+  			<h1 style="color: rgb(173,14,10);">SEC Publicidade</h1>
+  		</div>
+  		<div class="col-1">
+  			<span class="fa fa-print" style="cursor: pointer; font-size: 12pt;" aria-hidden="true" ng-click="imprimir()"></span>
+  		</div>
+  	</div>
+  	<hr>
+	<div class="row">
+		<div class="col-12" id='plotServicos' style="overflow-x: auto; overflow-y: hidden;"></div>
+  	</div>
+  	<hr>
+	<div class="row">
+		<div class="col-12" id='plotServicosValores' style="overflow-x: auto; overflow-y: hidden;"></div>
+  	</div>
+  </div>
+
+</div>
+
+</div>
