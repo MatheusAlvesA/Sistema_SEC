@@ -543,6 +543,7 @@ class Persistencia {
 		$consulta = $this->con->prepare('SELECT * FROM parcelacontrato WHERE 
 	        	(`datepagamento` IS NOT NULL
 	            AND (`datepagamento` >= DATE("'.(date('Y')-1).'-'.(date('m')).'-01"))
+	            AND (`datepagamento` < DATE("'.date('Y').'-'.(date('m')).'-01"))
 	            )'); // preparando
 		$consulta->execute(); // executando em cima do id do contrato
 

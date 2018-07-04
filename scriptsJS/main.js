@@ -124,6 +124,12 @@ app.filter('dinheiro', function() {
 app.filter('dataBR', function() {
     return function(valor) {
         if(valor === undefined || valor === null || typeof valor != 'string') return '';
-        return valor.split('-').reverse().join('/');
+        let vetor  = valor.split('-'); // separando os elementos
+        let doisDigitos = vetor.map(function (x) { // aplicando um zero a esquerda dos elementos que só tiverem um digito
+          if(x.length == 1)
+            return '0'+x;
+          else return x;
+        });
+        return doisDigitos.reverse().join('/');
     };
 });

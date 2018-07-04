@@ -2,16 +2,19 @@
 require_once('vendor/autoload.php');
 require_once('../config.php');
 
+header("Content-type: application/json; charset=utf-8");
+
 if(Config::REQUISITAR_LOGIN) // Se for nescesário estar logado para usar o sistema
 	testarLogin(); //Impedindo acesso de usuários não logados
 
-header('Content-Type: application/json');
 if(Config::CORS) //Checando se deve ou não habilitar Cross Origin
 	header("Access-Control-Allow-Origin: *");
+
 if(!Config::EXIBIR_ERROS) {// Impedindo ou não a exibição de erros
 	error_reporting(0);
 	ini_set('display_errors', 0);
 }
+
 use Sistema\Sistema;
 
 try {
@@ -116,7 +119,7 @@ function buscaContrato($dados) {
 		$lista = [['id'=>$dados['id_cliente']]];
 
 	if(count($lista) === 0) // caso não existam clientes com esse nome
-		return '{"erro": 404}';
+		return '{"erro": 404, "status": "falha"}';
 	if(count($lista) === 1) { // caso só existe um cliente com esse nome
 		try {
 			$lista_contratos = $sistema->listarContratosCliente($lista[0]['id']); // listando contratos deste cliente
@@ -124,13 +127,14 @@ function buscaContrato($dados) {
 		catch (Exception $e) { // Não foi possível encontrar nenhum contrato por uma falha interna
 			return '{
 			"resultado": "conclusivo",
-			"dados": []
+			"dados": [],
+			"status": "falha"
 			}'; // retornando uma lista vazia de contratos
 		}
 
 		$lista_contratos_filtrada = filtrar($lista_contratos, $dados); // filtrando de acordo com os parâmetros passados
 		if(count($lista_contratos_filtrada) <= 0) // não sobrou contratos após a filtragem
-			return '{"erro": 404}';
+			return '{"erro": 404, "status": "falha"}';
 		// retornando a lista filtrada
 		return '{
 			"resultado": "conclusivo",
@@ -519,11 +523,11 @@ function parsear($dados) {
 	try {
 		$requisicao = json_decode($dados, true);
 	} catch (Exception $e) {
-		echo '{"erro": "Erro ao parsear o corpo da requisição"}';
+		echo '{"erro": "Erro ao parsear o corpo da requisição", "status": "falha"}';
 		return false;
 	}
 	if($requisicao === null) {
-		echo '{"erro": "Erro ao parsear o corpo da requisição"}';
+		echo '{"erro": "Erro ao parsear o corpo da requisição", "status": "falha"}';
 		return false;
 	}
 
@@ -533,7 +537,7 @@ function parsear($dados) {
 function testarLogin() {
 	session_start();
 	if($_SESSION['logado'] !== 'S') {
-		echo '{"erro": " O usuário não está logado no sistema"}';
+		echo '{"erro": " O usuário não está logado no sistema", "status": "falha"}';
 		exit(0);
 	}
 }

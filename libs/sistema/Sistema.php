@@ -344,6 +344,8 @@ class Sistema {
 			string $complemento,
 			string $titular_cpf): bool
 	{
+		if($nome_cliente == '') return false; //Precisa ter pelo menos o nome
+
 		$novoCliente = new \Persistencia\Cliente(0,
 			$nome_cliente,
 			$logradouro,
@@ -823,7 +825,7 @@ class Sistema {
 					return false;
 				}
 			}
-			// Não precisa testar se pagamento e vencimento são nulos pois sempre estaram preencidos ou se forem nulos é pq é pra ser mesmo
+			// Não precisa testar se pagamento é nulo pois sempre estará preencido ou se for nulo é pq deve ser setado como não pago
 				try {$item->setDataPagamento($dados['dataPagamento']);}
 				catch (PersistenciaException $e) {
 					Logger::logar($e);
@@ -869,7 +871,9 @@ class Sistema {
 		retorna 1 se forem parecidas
 		retorna 2 se forem identicas
 	*/
-	public static function strParecidas($str1, $str2) {
+	public static function strParecidas(String $str1, String $str2): int {
+		if($str1 == '' || $str2 == '') return 0; // Não dá para comparar se a string for vazia
+
 		$str1 = \preg_replace(['/Á/','/É/','/Í/','/Ó/','/Ú/','/Â/','/Ê/','/Î/','/Ô/','/Û/','/Ã/','/Õ/'], ['A','E','I','O','U','A','E','I','O','U','A','O'] , mb_strtoupper($str1));
 		$str2 = \preg_replace(['/Á/','/É/','/Í/','/Ó/','/Ú/','/Â/','/Ê/','/Î/','/Ô/','/Û/','/Ã/','/Õ/'], ['A','E','I','O','U','A','E','I','O','U','A','O'] , mb_strtoupper($str2));
 

@@ -153,7 +153,7 @@ $scope.deletarCliente = function() {
 
           var temp = [];
           for(x = 0; x < $scope.clientesBuscados.length; x++) // buscando qual foi o contrato editado na lista de contratos
-            if($scope.clientesBuscados[x].idCliente !== $scope.contratoSelecionado.idCliente)
+            if($scope.clientesBuscados[x].idCliente !== $scope.clienteSelecionado.idCliente)
               temp.push($scope.clientesBuscados[x]);
           $scope.clientesBuscados = temp;
 

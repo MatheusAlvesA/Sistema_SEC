@@ -722,7 +722,7 @@ $scope.criarContrato = function() {
   ####### SUBSISTEMA CRIAÇÃO E EDIÇÃO DE ITENS DE CONTRATO #######
 _________________________________________________________________*/
   $scope.itemEditando = {}; // O item que estiver sendo editado será guardado aqui temporariamente.
-  $scope.eventListenerInserirItem = false; // O gatilho de da tecla enter ainda não foi criado
+  $scope.eventListenerInserirItem = false; // O gatilho da tecla enter ainda não foi criado
   $scope.mostrarItens = function(idContrato) {
 
     /*
@@ -786,13 +786,7 @@ _________________________________________________________________*/
   $scope.tratarItens = function(itens) {
     itens = copiar(itens);
 
-    $scope.itemEditando.numero = 0;
-    itens.forEach(function (x) {if(x.numero > $scope.itemEditando.numero) $scope.itemEditando.numero = x.numero;});
-    $scope.itemEditando.numero++;
-
-    $scope.itemEditando.dataVencimento = new Date();
-    $scope.itemEditando.func = 'Criar';
-    $scope.itemEditando.Processando = false;
+    $scope.resetarPainelEditarItem(itens);
 
     $scope.itensTotal = itens.length;
     $scope.itensSomaValor = Number(itens.reduce(function(valorAnterior, valorAtual) {return valorAnterior+(valorAtual.valorBruto-valorAtual.deducoes);}, 0).toFixed(2));
@@ -823,6 +817,20 @@ _________________________________________________________________*/
 
     return itens;
   };
+
+  $scope.resetarPainelEditarItem = function (itens) {
+    if(itens === undefined) // Caso não seja passada a lista de itens
+      itens = $scope.itensBuscados; // tente pegar da lista já existente
+
+    $scope.itemEditando = {};
+    $scope.itemEditando.numero = 0;
+    itens.forEach(function (x) {if(x.numero > $scope.itemEditando.numero) $scope.itemEditando.numero = x.numero;});
+    $scope.itemEditando.numero++;
+
+    $scope.itemEditando.dataVencimento = new Date();
+    $scope.itemEditando.func = 'Criar';
+    $scope.itemEditando.Processando = false;
+  }
 
   $scope.editarParcela = function(id) {
     for(var index = 0; index < $scope.itensBuscados.length; index++)
@@ -872,8 +880,6 @@ _________________________________________________________________*/
         'alvo': 'item',
         'parametros': item
       };
-      $scope.itensBuscados.push(item); // Se adiantando e inserindo o item logo
-      $scope.itemEditando = {func: 'Criar'};
     }
     else { // Atualizar um item existente de contrato
       comando = {
@@ -882,15 +888,13 @@ _________________________________________________________________*/
         'id': $scope.itemEditando.idParcelaContrato,
         'parametros': item
       };
-      $scope.itemEditando = {func: 'Salvar'};
     }
 
     $scope.itemEditando.Processando = true;
     $('#ItemEditValorBruto').focus();
     requisitarAPI.post(comando,
         function(dados) { //callback de sucesso
-          $scope.itemEditando.Processando = false; // Não está mais processando essa requisição
-          $scope.mostrarItens($scope.idContratoDosItens);
+          $scope.resetarPainelEditarItem();
 
           if(dados.status !== 200 || typeof dados.data === 'string') { // erro desconhecido do servidor
             mensagemERRO.editarItem();
@@ -901,20 +905,80 @@ _________________________________________________________________*/
             return false;
           }
           else { // sucesso
+            if(comando.comando === 'criar') // Se o objetivo era inserir um novo item na tabela
+              $scope.itensBuscados.push(item); // Se adiantando e inserindo o item antes mesmo da função mostrarItem terminar
+            $scope.mostrarItens($scope.idContratoDosItens); // Plotando a tabela de itens novamente
             return true;
           }
         },
         function(dados) { // callback de falha
-          $scope.itemEditando.Processando = false; // Não está mais processando essa requisição
+          $scope.resetarPainelEditarItem();
 
           mensagemERRO.editarItemConexao();
-          $scope.mostrarItens($scope.idContratoDosItens);
           return false;
         }
     );
   };
 
+  $scope.itemFoiPagoHoje = function(id) {$scope.itemFoiPagoEm(id, new Date());};
+  $scope.itemFoiPagoEm = function(id, data) {
+    for(var index = 0; index < $scope.itensBuscados.length; index++)
+      if($scope.itensBuscados[index].idParcelaContrato == id)
+        break;
+    if(index >= $scope.itensBuscados.length)
+      return false;
+
+    let itemPago = $scope.itensBuscados[index];
+
+    let dataFormatada = null;
+    if(data != null)
+      dataFormatada = toData(data).split('-').reverse().join('-'); // Formatando a data passada com o formato aceito pelo servidor //YYYY-MM-DD
+
+    let comando = {
+      'comando': 'atualizar',
+      'alvo': 'item',
+      'id': itemPago.idParcelaContrato,
+      'parametros': {'dataPagamento': dataFormatada}
+    };
+
+    requisitarAPI.post(comando,
+        function(dados) { //callback de sucesso
+          if(dados.status !== 200 || typeof dados.data === 'string') { // erro desconhecido do servidor
+            return false;
+          }
+          if(dados.data.erro !== undefined || dados.data.status === 'falha') { // algum erro conhecido detectado pelo servidor
+            return false;
+          }
+          else { // sucesso
+
+            itemPago.dataPagamento = dataFormatada; // a atualização funcionou, então aplicando na tabela
+            if(dataFormatada !== null) // a data de pagamente não é nula, significa que foi pago
+              itemPago.corVencimento = 'white'; // Remover o vermelho de aviso de vencimento, caso exista
+            else { // Entrando aqui, significa que o item não está pago
+              //Testando se a data de vencimento já passou
+              let dataVencimento = fromData(itemPago.dataVencimento);
+              let dataHoje = new Date();
+              if(dataHoje >= dataVencimento) // Se o item já venceu
+                itemPago.corVencimento = 'red'; // Indicando o vencimento
+            }
+            return true;
+
+          }
+        },
+        function(dados) { // callback de falha
+          return false;
+        }
+    );
+
+  };
+
+  $scope.editarDataPagamentoItem = function(id) {
+    $('#tela_setar_dataPagamento').modal({keyboard: false});
+    $scope.idFromTelaSetarDataPagamento = id; // Guardando o id do item que deve ter sua data de pagamento alterada
+  }
+
   $scope.deletarParcela = function(id) {
+    $('[data-toggle="tooltip"]').tooltip('hide'); // Escondendo o tooltip. Se o elemento for deletado vai bugar se o tooltip estiver na tela
     if(!confirm("Tem certeza que quer deletar essa parcela?")) return false;
 
     let backup = copiar($scope.itensBuscados);//caso falhe
