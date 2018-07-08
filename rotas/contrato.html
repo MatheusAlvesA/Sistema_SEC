@@ -146,8 +146,13 @@
   		</div>
   	</div>
   	<div class="row">
-  		<div class="col-sm-12">
+  		<div class="col-sm-2">
   			<button class="bnt btn-success btn-sm float-left" style="cursor: pointer;" ng-click="voltarItens2Contratos()">Voltar</button>
+  		</div>
+  		<div class="col-sm-8">
+  			<button class="btn btn-outline-dark btn-sm float-right" style="cursor: pointer;" ng-click="painelNotaFiscal()">Registrar Nota Fical</button>
+  		</div>
+  		<div class="col-sm-2">
   			<button class="bnt btn-success btn-sm float-right" style="cursor: pointer;" ng-click="rolarParaBaixo()">Descer</button>
   		</div>
   	</div>
@@ -161,7 +166,7 @@
 	        <th>Valor</th>
 	        <th>Desconto</th>
 	        <th>Nota</th>
-	        <th>Observação</th>
+	        <th>Serviço</th>
 	        <th>Ações</th>
 	      </tr>
 	    </thead>
@@ -173,11 +178,13 @@
 	        <td data-toggle="tooltip" data-placement="top" title="Valor R$">{{x.valorBruto | dinheiro}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Deduções">{{x.deducoes | dinheiro}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Nº Nota Fiscal">{{x.notaFiscal}}</td>
-	        <td data-toggle="tooltip" data-placement="top" title="Observação">{{x.observacao}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Serviço">{{x.observacao}}</td>
 	        <td>
 	        	<span style="font-size: 15pt;cursor: pointer;" ng-click="editarParcela(x.idParcelaContrato)" class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Editar item"></span>-<span style="font-size: 15pt; cursor: pointer; color: red;" ng-click="deletarParcela(x.idParcelaContrato)" class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Apagar item"></span>
 	        	<br>
 	        	<span style="font-size: 14pt;cursor: pointer; color: #38C7E0;" ng-click="itemFoiPagoHoje(x.idParcelaContrato)" class="fa fa-calendar-check-o" data-toggle="tooltip" data-placement="top" title="Foi pago hoje"></span>-<span style="font-size: 14pt;cursor: pointer; color: #64E66D;" ng-click="editarDataPagamentoItem(x.idParcelaContrato)" class="fa fa-calendar-check-o"data-toggle="tooltip" data-placement="top" title="Foi pago em..."></span>
+	        	<br>
+	        	<span style="font-size: 14pt;cursor: pointer; color: #BCD2EE;" ng-hide="!notaFiscalPreConfigurada" ng-click="setNotaFicalConfigurada(x.idParcelaContrato)" class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="Preencher nota fiscal"></span>
 			</td>
 	      </tr>
 	    </tbody>
@@ -414,6 +421,40 @@
     </div>
  </div>
 <!--Fim da tela para setar data de pagamento de um item-->
+
+<!--Inicio da tela para setar a nota fiscal-->
+<div class="modal fade" id="tela_setar_notaFical">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Registrar nota fiscal</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+			<div class="row">
+				<label class="col-2 col-form-label">Vencimento: </label>
+				<div class="col-5">
+					<input class="form-control" type="date" ng-model="dataFromTelaSetarNotaFiscal">
+				</div>
+				<label class="col-2 col-form-label">Número: </label>
+				<div class="col-3">
+					<input class="form-control" type="text" ng-model="numeroFromTelaSetarNotaFiscal">
+				</div>
+			</div>
+		</div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" id="bnt_setar_dataPagamento" ng-click="registrarNotaFical()" style="cursor: pointer;">Começar...</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>
+<!--Fim da tela para setar a nota fiscal-->
 
 <!--Inicio da tela de criação de contrato-->
 <div class="container-fluid" id="tela_criacao" style="display: none;">

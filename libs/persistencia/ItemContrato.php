@@ -26,6 +26,9 @@ class ItemContrato extends ModeloDados {
 		int $numero,
 		Persistencia $banco
 	) {
+		if($data_pagamento === '') //Se essa parâmetro for passado para o banco ele vai setar a fata como 00/00/0000
+			$data_pagamento = null; // Transformando em null para evitar o problema
+
 		$this->id_parcela_contrato = $id_parcela_contrato;
 		$this->id_contrato = $id_contrato;
 		$this->valor_bruto = $valor_bruto;
@@ -55,6 +58,12 @@ class ItemContrato extends ModeloDados {
 /*
 	FUNÇÕES SET
 */
+
+	public function setIdItem(int $valor): bool {
+		$this->id_parcela_contrato = $valor;
+		return true;
+	}
+
 	public function setIdContrato(int $valor): bool {
 		if($this->atualizarAtributo('idcontrato', $valor)) {
 			$this->id_contrato = $valor;

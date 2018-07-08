@@ -114,6 +114,25 @@ class Sistema {
 			return [];
 		}
 	}
+	public function listarItensNotaFiscal(int $numero): Array {
+		$retorno = [];
+		try {
+			$retorno = $this->persistencia->getRelatorio(Relatorio::NOTAFISCAL, $numero);
+		} catch (PersistenciaException $e) {
+			Logger::logar($e);
+			return [];
+		}
+
+		if(count($retorno) > 0) {
+			$cliente = $retorno[0]->getContrato()->getNomeCliente();
+		}
+
+		$lista = array_map(function($item) {
+			return $item->toArray();
+		}, $retorno);
+
+		return ['cliente' => $cliente, 'itens' => $lista];
+	}
 
 	public function listarClientes() {
 		$nomes = $this->listarNomesCliente();
@@ -382,12 +401,12 @@ class Sistema {
 		int $id_contrato,
 		float $valor_bruto,
 		string $data_vencimento,
-		$data_pagamento, // Pode ser string pu nulo
+		$data_pagamento, // Pode ser string ou nulo
 		float $deducoes,
 		$nota_fiscal,
 		string $observacao,
 		bool $foi_paga,
-		int $numero): bool
+		int $numero)
 	{
 		$novoItem = new \Persistencia\ItemContrato(0,
 			$id_contrato,
@@ -402,7 +421,9 @@ class Sistema {
 			$this->persistencia);
 		try {
 			$r = $this->persistencia->inserir($novoItem);
-			return $r;
+			if($r)
+				return $novoItem->getIdItem();
+			return false;
 		} catch (PersistenciaException $e) {
 			Logger::logar($e);
 			return false;
@@ -808,7 +829,12 @@ class Sistema {
 	}
 
 	public function atualizarItem(int $id, $dados): bool {
-			$item = $this->persistencia->getItemContrato($id);
+			try {
+				$item = $this->persistencia->getItemContrato($id);
+			} catch (PersistenciaException $e) {
+				Logger::logar($e);
+				return false;
+			}
 
 			if(isset($dados['valorBruto'])) {
 				try {$item->setValorBruto((float) $dados['valorBruto']);}
@@ -825,12 +851,15 @@ class Sistema {
 					return false;
 				}
 			}
-			// Não precisa testar se pagamento é nulo pois sempre estará preencido ou se for nulo é pq deve ser setado como não pago
+
+			if(isset($dados['dataPagamento'])) {
+				if($dados['dataPagamento'] === '') $dados['dataPagamento'] = null;
 				try {$item->setDataPagamento($dados['dataPagamento']);}
 				catch (PersistenciaException $e) {
 					Logger::logar($e);
 					return false;
 				}
+			}
 
 			if(isset($dados['deducoes'])) {
 				try {$item->setDeducoes((float) $dados['deducoes']);}
@@ -839,6 +868,7 @@ class Sistema {
 					return false;
 				}
 			}
+
 			if(isset($dados['notaFiscal'])) {
 				try {$item->setNotaFiscal((string) $dados['notaFiscal']);}
 				catch (PersistenciaException $e) {
@@ -846,6 +876,7 @@ class Sistema {
 					return false;
 				}
 			}
+			
 			if(isset($dados['observacao'])) {
 				try {$item->setObservacao((string) $dados['observacao']);}
 				catch (PersistenciaException $e) {

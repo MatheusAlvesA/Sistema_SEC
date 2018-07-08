@@ -43,6 +43,9 @@
       })
       .when("/relatorioGraficos", {
           templateUrl : "rotas/relatorioGraficos.html"
+      })
+      .when("/relatorioNotaFiscal", {
+          templateUrl : "rotas/relatorioNotaFiscal.html"
       });
   });
 
@@ -109,7 +112,7 @@ app.filter('dinheiro', function() {
         if(dpsVirgula !== undefined) {
           if(dpsVirgula.length == 1)
             dpsVirgula += '0';
-          else if(dpsVirgula.length > 2) // Não faz sentido a casa dos centavos ter tês ou mais dígitos
+          else if(dpsVirgula.length > 2)  // Não faz sentido a casa dos centavos ter tês ou mais dígitos
             dpsVirgula = dpsVirgula[0] + dpsVirgula[1];
           final += ',' + dpsVirgula;
         }

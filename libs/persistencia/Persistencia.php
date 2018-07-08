@@ -267,7 +267,8 @@ class Persistencia {
 																        'deducoes' => (float)$value['deducoes'],
 																        'valorLiquido' => (float)$value['valorliquido'],
 																        'notaFiscal' => utf8_encode($value['notafiscal'])
-							        					]]
+							        					]],
+							        					'valorSoma' => (float)$value['valorbruto']
 							        ]]
 		    					]
 		    	);
@@ -291,7 +292,8 @@ class Persistencia {
 											'deducoes' => (float)$value['deducoes'],
 											'valorLiquido' => (float)$value['valorliquido'],
 											'notaFiscal' => utf8_encode($value['notafiscal'])
-							        	]]
+							        	]],
+							'valorSoma' => (float)$value['valorbruto']
 						]
 					);
 				}
@@ -305,6 +307,7 @@ class Persistencia {
 								'notaFiscal' => utf8_encode($value['notafiscal'])
 							]
 					);
+					$retorno[$index]['contratos'][$contrato_index]['valorSoma'] += (float)$value['valorbruto'];
 				}
 				$retorno[$index]['somaBruto'] += (float)$value['valorbruto'];
 				$retorno[$index]['somaLiquido'] += (float)$value['valorliquido'];
@@ -649,6 +652,9 @@ class Persistencia {
 			if($tabela === 'contrato') { // caso especial
 				$objeto->setIdContrato($this->con->lastInsertId()); // registrando o id deste contrato
 			}
+			if($tabela === 'parcelacontrato') { // caso especial
+				$objeto->setIdItem($this->con->lastInsertId()); // registrando o id deste item
+			}
 		}
 		return $r;
 	}
@@ -923,7 +929,7 @@ class Persistencia {
 	}
 
 
-	public function getRelatorio(int $relatorio) {
+	public function getRelatorio(int $relatorio, $opcional = null) {
 		switch ($relatorio) {
 			case (Relatorio::EMAIL):
 				return $this->listarEmails();
@@ -934,6 +940,9 @@ class Persistencia {
 			case (Relatorio::itensPagosNosUltimos12Meses):
 				return $this->getItensUltimos12Meses();
 			break;
+			case (Relatorio::NOTAFISCAL):
+				return $this->getItensDaNotaFiscal($opcional);
+			break;
 
 			default:
 				$e = new PersistenciaException("Código de relatório desconhecido");
@@ -942,6 +951,43 @@ class Persistencia {
 			break;
 		}
 	}
+
+	public function getItensDaNotaFiscal(int $numero): array {
+		$consulta = $this->con->prepare('SELECT * FROM parcelacontrato WHERE notafiscal=:n;'); // preparando
+
+		$sucesso = $consulta->execute(['n'=>$numero]); // executando
+
+		if(!$sucesso) {
+			$e = new PersistenciaException("Não obter os itens da nota fiscal");
+			$e->setEstado(
+				'Numero: '.$numero.', '.
+				'PDOStatement::errorInfo: '.json_encode( $consulta->errorInfo() )
+			);
+			throw $e;
+		}
+
+		$rs = $consulta->fetchAll(); //extraindo a matriz de resultados
+
+		$vetor_de_itens = [];
+		foreach ($rs as $chave => $valor) {
+			array_push($vetor_de_itens, 
+				new ItemContrato((int) $valor['idparcelaContrato'],
+								(int) $valor['idcontrato'],
+								(float) $valor['valorbruto'],
+								utf8_encode($valor['datavencimento']),
+								utf8_encode($valor['datepagamento']),
+								(float) $valor['deducoes'],
+								utf8_encode($valor['notafiscal']),
+								utf8_encode($valor['observacao']),
+								(bool) $valor['foipaga'],
+								(float) $valor['numero'],
+								$this)
+			);
+		}
+
+		return $vetor_de_itens;
+	}
+
 	public function listarEmails(): array {
 		$consulta = $this->con->prepare('SELECT nomecliente, email FROM cliente;'); // preparando
 

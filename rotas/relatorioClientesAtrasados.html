@@ -1,5 +1,31 @@
 <div ng-controller="relatorioClientesAtrasadosCtrl">
-
+<div class="row">
+	<div class="col-sm-12">
+	  <form ng-submit="filtrarResultado()">
+	    <div class="form-group row">
+			<label class="col-sm-1 col-form-label">Nome:</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" ng-model="buscaNomeCliente" placeholder="Nome do Cliente">
+			</div>
+	     	<div class="col-sm-3">
+				<button id="bntBuscarCliente" ng-disabled="estadoBuscando" type="submit" class="btn btn-primary" style="cursor: pointer;">
+				Filtrar <span class="fa fa-search" aria-hidden="true"></span>
+				</button>
+	    	</div>
+	    </div>
+	    <div class="form-group row">
+			<label for="example-date-input" class="col-2 col-form-label">Vencimento entre:</label>
+			<div class="col-5">
+				<input class="form-control" type="date" ng-model="dataDesde">
+			</div>
+			<div class="col-5">
+				<input class="form-control" type="date" ng-model="dataAte">
+			</div>
+	    </div>
+	  </form>
+	</div>
+</div>
+<hr>
 <div class="container-fluid" id="tela_principal">
 	<div class="row" id='containerMensagemErro'>
 		<div class="col-12">
@@ -36,7 +62,7 @@
 	      <tr>
 	        <td style="width: 30%;">{{cliente.contato}}</td>
 	        <td style="width: 20%;"><b>Telefone: </b>{{cliente.telefone}}<br><b>Celular: </b>{{cliente.celular}}</td>
-	        <td style="width: 20%;"><b>Bruto: </b>{{cliente.somaBruto | dinheiro }} <br> <b>Liquido: </b>{{cliente.somaLiquido | dinheiro }}</td>
+	        <td style="width: 20%;"><b>Soma total: </b>{{cliente.somaBruto | dinheiro }}</td>
 	      </tr>
 	    </tbody>
 	  </table>
@@ -44,15 +70,14 @@
   	  <table class="table table-responsive-sm" ng-repeat="contrato in cliente.contratos">
 	    <thead>
 	      <tr>
-	        <th colspan="4">Contrato: {{contrato.idContrato}}</th>
+	        <th colspan="4">Contrato: {{contrato.idContrato}}. Soma da dívida: {{contrato.valorSoma | dinheiro}}</th>
 	      </tr>
 	    </thead>
 	    <tbody>
 	      <tr ng-repeat="item in contrato.itens">
-	        <td style="width: 25%;"><b>Vencimento: </b>{{item.dataVencimento}}</td>
-	        <td style="width: 25%;"><b>Bruto: </b>{{item.valorBruto | dinheiro}}</td>
-	        <td style="width: 25%;"><b>Liquido: </b>{{item.valorLiquido | dinheiro}}</td>
-	        <td style="width: 25%;"><b>Nota fiscal: </b>{{item.notaFiscal}}</td>
+	        <td><b>Vencimento: </b>{{item.dataVencimento | dataBR}}</td>
+	        <td><b>Bruto: </b>{{item.valorBruto | dinheiro}}</td>
+	        <td><b>Nota fiscal: </b>{{item.notaFiscal}}</td>
 	      </tr>
 	    </tbody>
 	  </table>

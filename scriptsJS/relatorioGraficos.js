@@ -80,16 +80,16 @@ app.controller("GraficosCtrl", function($scope, requisitarAPI, relatorio) {
 
       requisitarAPI.post(comando,
         function (retorno) { // callback, sucesso na conexão com o servidor
-          if(retorno.status !== 200 || typeof retorno.data === 'string' || retorno.data.erro !== undefined) { // erro desconhecido do servidor
-            $scope.exibirErro('mensagemErroConexao');
-          }
-          if(retorno.data.status === 'falha') {
+          if(retorno.status !== 200 || typeof retorno.data === 'string' || retorno.data.erro !== undefined || retorno.data.status === 'falha') { // erro desconhecido do servidor
             $scope.exibirErro('mensagemErroDesconhecido');
+            return false;
           }
           callback(retorno.data);
+          return true;
         },
         function (dados) { // callback, falha na conexão do servido
-          $scope.exibirErro('mensagemErroDesconhecido');
+          $scope.exibirErro('mensagemErroConexao');
+          return false;
         }
     );
   };

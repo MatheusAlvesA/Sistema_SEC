@@ -736,6 +736,8 @@ _________________________________________________________________*/
       $scope.eventListenerInserirItem = true; //Garantindo que não executará esse trecho mais de uma vez
     }
 
+    $scope.notaFiscalPreConfigurada = false; // removendo botão desnescesário da tela
+
     var retorno = null;
     $scope.idContratoDosItens = idContrato;
 
@@ -805,7 +807,7 @@ _________________________________________________________________*/
       function(valorAnterior, valorAtual) {
         var d = new Date();
         var vencimento = new Date(valorAtual.dataVencimento);
-        if(d >= vencimento && valorAtual.dataPagamento == "") {
+        if(d >= vencimento && (valorAtual.dataPagamento == "" || valorAtual.dataPagamento == null)) {
           valorAtual.corVencimento = 'red';
           return valorAnterior+1;
         }
@@ -859,8 +861,11 @@ _________________________________________________________________*/
 
     let dataPagamento = toData($scope.itemEditando.dataPagamento);
     if(dataPagamento != null) dataPagamento = dataPagamento.split('-').reverse().join('-');
+    else dataPagamento = '';
     let dataVencimento = toData($scope.itemEditando.dataVencimento);
     if(dataVencimento != null) dataVencimento = dataVencimento.split('-').reverse().join('-');
+    //O servidor não vai entender um parâmetro nulo, ao invés disso passando como string vazia
+    if($scope.itemEditando.notaFiscal == null) $scope.itemEditando.notaFiscal = '';
 
     let item = {
       'idContrato': $scope.idContratoDosItens,
@@ -873,7 +878,6 @@ _________________________________________________________________*/
       'numero': $scope.itemEditando.numero
     },
     comando = {};
-
     if($scope.itemEditando.func == 'Criar') {// criar um novo item de contrato
       comando = {
         'comando': 'criar',
@@ -888,6 +892,7 @@ _________________________________________________________________*/
         'id': $scope.itemEditando.idParcelaContrato,
         'parametros': item
       };
+      item.idParcelaContrato = $scope.itemEditando.idParcelaContrato;
     }
 
     $scope.itemEditando.Processando = true;
@@ -895,6 +900,7 @@ _________________________________________________________________*/
     requisitarAPI.post(comando,
         function(dados) { //callback de sucesso
           $scope.resetarPainelEditarItem();
+          $scope.rolarParaBaixo();
 
           if(dados.status !== 200 || typeof dados.data === 'string') { // erro desconhecido do servidor
             mensagemERRO.editarItem();
@@ -905,10 +911,53 @@ _________________________________________________________________*/
             return false;
           }
           else { // sucesso
-            if(comando.comando === 'criar') // Se o objetivo era inserir um novo item na tabela
+
+            if(comando.comando === 'criar') { // Se o objetivo era inserir um novo item na tabela
+
+              item.idParcelaContrato = dados.data.idItem;
+              if(item.dataPagamento !== null && item.dataPagamento !== '') // a data de pagamente não é nula, significa que foi pago
+                item.corVencimento = 'white'; // Remover o vermelho de aviso de vencimento, caso exista
+              else { // Entrando aqui, significa que o item não está pago
+                item.dataPagamento = '';
+                //Testando se a data de vencimento já passou
+                let dataVencimento = fromData(item.dataVencimento);
+                let dataHoje = new Date();
+                if(dataHoje >= dataVencimento) // Se o item já venceu
+                  item.corVencimento = 'red'; // Indicando o vencimento
+                else
+                  item.corVencimento = 'white';
+              }
+              if(item.notaFiscal === undefined || item.notaFiscal === null) item.notaFiscal = '';
               $scope.itensBuscados.push(item); // Se adiantando e inserindo o item antes mesmo da função mostrarItem terminar
-            $scope.mostrarItens($scope.idContratoDosItens); // Plotando a tabela de itens novamente
+              $scope.resetarPainelEditarItem();
+
+            }
+            else { // Se o objetivo era apenas salvar alterações em um item na tabela
+
+              for(var index = 0; index < $scope.itensBuscados.length; index++)
+                if($scope.itensBuscados[index].idParcelaContrato == item.idParcelaContrato)
+                  break;
+              if(index >= $scope.itensBuscados.length)
+                return false;
+
+              if(item.dataPagamento !== null && item.dataPagamento !== '') // a data de pagamente não é nula, significa que foi pago
+                item.corVencimento = 'white'; // Remover o vermelho de aviso de vencimento, caso exista
+              else { // Entrando aqui, significa que o item não está pago
+                item.dataPagamento = '';
+                //Testando se a data de vencimento já passou
+                let dataVencimento = fromData(item.dataVencimento);
+                let dataHoje = new Date();
+                if(dataHoje >= dataVencimento) // Se o item já venceu
+                  item.corVencimento = 'red'; // Indicando o vencimento
+                else
+                  item.corVencimento = 'white';
+              }
+              if(item.notaFiscal === undefined || item.notaFiscal === null) item.notaFiscal = '';
+              $scope.itensBuscados[index] = item; // Se adiantando e inserindo o item antes mesmo da função mostrarItem terminar
+
+            }
             return true;
+
           }
         },
         function(dados) { // callback de falha
@@ -930,7 +979,7 @@ _________________________________________________________________*/
 
     let itemPago = $scope.itensBuscados[index];
 
-    let dataFormatada = null;
+    let dataFormatada = '';
     if(data != null)
       dataFormatada = toData(data).split('-').reverse().join('-'); // Formatando a data passada com o formato aceito pelo servidor //YYYY-MM-DD
 
@@ -952,7 +1001,7 @@ _________________________________________________________________*/
           else { // sucesso
 
             itemPago.dataPagamento = dataFormatada; // a atualização funcionou, então aplicando na tabela
-            if(dataFormatada !== null) // a data de pagamente não é nula, significa que foi pago
+            if(dataFormatada !== '') // a data de pagamente não é nula, significa que foi pago
               itemPago.corVencimento = 'white'; // Remover o vermelho de aviso de vencimento, caso exista
             else { // Entrando aqui, significa que o item não está pago
               //Testando se a data de vencimento já passou
@@ -975,9 +1024,86 @@ _________________________________________________________________*/
   $scope.editarDataPagamentoItem = function(id) {
     $('#tela_setar_dataPagamento').modal({keyboard: false});
     $scope.idFromTelaSetarDataPagamento = id; // Guardando o id do item que deve ter sua data de pagamento alterada
-  }
+  };
 
+  $scope.painelNotaFiscal = function() {$('#tela_setar_notaFical').modal({keyboard: false});};
+
+  $scope.notaFiscalPreConfigurada = false;
+  $scope.registrarNotaFical = function() {
+    $scope.notaFiscalConfigurada = {};
+    $scope.notaFiscalConfigurada.vencimento = toData($scope.dataFromTelaSetarNotaFiscal);
+    $scope.notaFiscalConfigurada.numero = $scope.numeroFromTelaSetarNotaFiscal;
+    $scope.notaFiscalPreConfigurada = true;
+  };
+
+  $scope.setNotaFicalConfigurada = function(id) {
+    if(!$scope.notaFiscalPreConfigurada) return false;
+
+    for(var index = 0; index < $scope.itensBuscados.length; index++)
+      if($scope.itensBuscados[index].idParcelaContrato == id)
+        break;
+    if(index >= $scope.itensBuscados.length)
+      return false;
+
+    let item = $scope.itensBuscados[index];
+
+    let dataFormatada = null;
+    if($scope.notaFiscalConfigurada.vencimento != null)
+      dataFormatada = $scope.notaFiscalConfigurada.vencimento.split('-').reverse().join('-'); // Formatando a data passada com o formato aceito pelo servidor //YYYY-MM-DD
+
+    if($scope.notaFiscalConfigurada.numero === undefined)
+      $scope.notaFiscalConfigurada.numero = '';
+
+    let comando = {
+      'comando': 'atualizar',
+      'alvo': 'item',
+      'id': item.idParcelaContrato,
+      'parametros': {
+        'notaFiscal': $scope.notaFiscalConfigurada.numero,
+        'dataVencimento': dataFormatada,
+        'dataPagamento': item.dataPagamento
+      }
+    };
+
+    requisitarAPI.post(comando,
+        function(dados) { //callback de sucesso
+          if(dados.status !== 200 || typeof dados.data === 'string') { // erro desconhecido do servidor
+            return false;
+          }
+          if(dados.data.erro !== undefined || dados.data.status === 'falha') { // algum erro conhecido detectado pelo servidor
+            return false;
+          }
+          else { // sucesso
+
+            if(item.dataPagamento !== null && item.dataPagamento !== '') // a data de pagamente não é nula, significa que foi pago
+              item.corVencimento = 'white'; // Remover o vermelho de aviso de vencimento, caso exista
+            else if(dataFormatada != null){ // Entrando aqui, significa que o item não está pago
+              //Testando se a data de vencimento já passou
+              let dataVencimento = fromData(dataFormatada);
+              let dataHoje = new Date();
+              if(dataHoje >= dataVencimento) // Se o item já venceu
+                item.corVencimento = 'red'; // Indicando o vencimento
+              else
+                item.corVencimento = 'white'; // Indicando o vencimento
+            }
+            item.notaFiscal = $scope.notaFiscalConfigurada.numero;
+            if(dataFormatada != null)
+              item.dataVencimento = dataFormatada;
+            return true;
+
+          }
+        },
+        function(dados) { // callback de falha
+          return false;
+        }
+    );
+  };
+
+  $scope.deletandoItem = false;
   $scope.deletarParcela = function(id) {
+    if($scope.deletandoItem) return false;
+    $scope.deletandoItem = true;
+
     $('[data-toggle="tooltip"]').tooltip('hide'); // Escondendo o tooltip. Se o elemento for deletado vai bugar se o tooltip estiver na tela
     if(!confirm("Tem certeza que quer deletar essa parcela?")) return false;
 
@@ -996,8 +1122,6 @@ _________________________________________________________________*/
       i++;
     }
 
-    $scope.itensBuscados = copiar(novo);
-
     var comando = {
       'comando': 'deletar',
       'alvo': 'item',
@@ -1006,18 +1130,17 @@ _________________________________________________________________*/
 
     requisitarAPI.post(comando,
         function(dados) { //callback de sucesso
+          $scope.deletandoItem = false;
           if(dados.status !== 200 || typeof dados.data === 'string') { // erro desconhecido do servidor
-            $scope.itensBuscados = backup; // não deletou, então restaurando
             return false;
           }
           if(dados.data.erro !== undefined || dados.data.status === 'falha') { // algum erro conhecido detectado pelo servidor
-            $scope.itensBuscados = backup; // não deletou, então restaurando
             return false;
           }
-          else {$scope.mostrarItens($scope.idContratoDosItens);return true;} // sucesso ao deletar o item
+          else {$scope.itensBuscados = copiar(novo);return true;} // sucesso ao deletar o item
         },
         function(dados) { // callback de falha
-          $scope.itensBuscados = backup; // não deletou, então restaurando
+          $scope.deletandoItem = false;
           return false;
         }
     );

@@ -28,6 +28,7 @@ $request = parsear(file_get_contents('php://input')); // Recebendo e parceando o
 if($request === false) // Checando se a requisição é válida
 	exit(0);
 
+
 switch ($request['comando']) { // Delegando o comando solicitado a função correspondente
 	case 'buscar':
 		buscar($request['parametros']);
@@ -138,12 +139,14 @@ function buscaContrato($dados) {
 		// retornando a lista filtrada
 		return '{
 			"resultado": "conclusivo",
+			"status": "sucesso",
 			"dados": '.json_encode($lista_contratos_filtrada).'
 		}';
 	}
 	else { //caso existam mais de um cliente com esse nome
 		$resposta = [
 			'resultado' => 'inconclusivo',
+			"status"=> "sucesso",
 			'dados' => $lista
 		];
 		return json_encode($resposta);
@@ -333,8 +336,8 @@ function criar($request) {
 				false, 
 				(int) $request['parametros']['numero']
 			);
-		if($r)
-			echo '{"status": "sucesso"}';
+		if($r !== false)
+			echo '{"status": "sucesso", "idItem": '.$r.'}';
 		else
 			echo '{"status": "falha"}';
 	}
@@ -401,6 +404,10 @@ function relatorio($request) {
 
 		case 'servicosFinalizadosUltimos12Meses':
 			echo json_encode($sistema->listarServicosFinalizadosUltimos12Meses());
+			break;
+
+		case 'NotaFiscal':
+			echo json_encode($sistema->listarItensNotaFiscal((int)$request['numero']));
 			break;
 
 		default:

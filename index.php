@@ -94,6 +94,7 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
         <div id="painelRelatorios">
           <a href="#!relatorioGraficos" class="list-group-item list-group-item-dark">Gráficos</a>
           <a href="#!relatorioClientes" class="list-group-item list-group-item-dark">Clientes</a>
+          <a href="#!relatorioNotaFiscal" class="list-group-item list-group-item-dark">Nota Fiscal</a>
           <a href="#!relatorioClientesAtrasados" class="list-group-item list-group-item-dark">Clientes atrasados</a>
           <a href="#!relatorioClientesAtivos" class="list-group-item list-group-item-dark">Clientes ativos</a>
           <a href="#!relatorioClientesInativos" class="list-group-item list-group-item-dark">Clientes inativos</a>
@@ -136,6 +137,7 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
 <script type="text/javascript" src="scriptsJS/relatorioClientesAtivos.js"></script>
 <script type="text/javascript" src="scriptsJS/relatorioClientesInativos.js"></script>
 <script type="text/javascript" src="scriptsJS/relatorioGraficos.js"></script>
+<script type="text/javascript" src="scriptsJS/relatorioNotaFiscal.js"></script>
 
 </body>
 </html>

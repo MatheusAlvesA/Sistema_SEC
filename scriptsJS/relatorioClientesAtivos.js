@@ -13,7 +13,7 @@ $scope.baixarRelatorio = function() {
     requisitarAPI.post(comando,
         function (dados) { // callback, sucesso na conexão com o servidor
           if(dados.status !== 200 || typeof dados.data === 'string' || dados.data.erro !== undefined) { // erro desconhecido do servidor
-          	$scope.exibirErro('mensagemErroConexao');
+          	$scope.exibirErro('mensagemErroDesconhecido');
             return false;
           }
           if(dados.data.status === 'falha') {
@@ -23,7 +23,7 @@ $scope.baixarRelatorio = function() {
           $scope.lista = dados.data.sort(function(a,b){return a.nomeCliente.localeCompare(b.nome);});
         },
         function (dados) { // callback, falha na conexão do servido
-        	$scope.exibirErro('mensagemErroDesconhecido');
+        	$scope.exibirErro('mensagemErroConexao');
         	return false;
         }
     );
