@@ -496,7 +496,7 @@ class Persistencia {
 
 		return new Produto((int) $rs['idproduto'],
 							(int) $rs['idcategoria'],
-							utf8_encode(rs['nomeProduto']),
+							utf8_encode($rs['nomeProduto']),
 							$this);
 	}
 
@@ -531,12 +531,17 @@ class Persistencia {
 
 		return new ItemContrato((int) $rs['idparcelaContrato'],
 								(int) $rs['idcontrato'],
+								$rs['idproduto'],
 								(float) $rs['valorbruto'],
 								utf8_encode($rs['datavencimento']),
 								utf8_encode($rs['datepagamento']),
+								utf8_encode($rs['dataprestacao']),
 								(float) $rs['deducoes'],
+								$rs['valorapagar'],
 								utf8_encode($rs['notafiscal']),
+								utf8_encode($rs['notafiscalapagar']),
 								utf8_encode($rs['observacao']),
+								utf8_encode($rs['medidas']),
 								(bool) $rs['foipaga'],
 								(float) $rs['numero'],
 								$this);
@@ -561,15 +566,21 @@ class Persistencia {
 		foreach ($rs as $chave => $valor) {
 			array_push($retorno, new ItemContrato((int) $valor['idparcelaContrato'],
 								(int) $valor['idcontrato'],
+								$valor['idproduto'],
 								(float) $valor['valorbruto'],
 								utf8_encode($valor['datavencimento']),
 								utf8_encode($valor['datepagamento']),
+								utf8_encode($valor['dataprestacao']),
 								(float) $valor['deducoes'],
+								$valor['valorapagar'],
 								utf8_encode($valor['notafiscal']),
+								utf8_encode($valor['notafiscalapagar']),
 								utf8_encode($valor['observacao']),
+								utf8_encode($valor['medidas']),
 								(bool) $valor['foipaga'],
 								(float) $valor['numero'],
-								$this));
+								$this)
+					);
 		}
 
 		return $retorno;
@@ -895,12 +906,17 @@ class Persistencia {
 			array_push($vetor_de_itens, 
 				new ItemContrato((int) $valor['idparcelaContrato'],
 								(int) $valor['idcontrato'],
+								$valor['idproduto'],
 								(float) $valor['valorbruto'],
 								utf8_encode($valor['datavencimento']),
 								utf8_encode($valor['datepagamento']),
+								utf8_encode($valor['dataprestacao']),
 								(float) $valor['deducoes'],
+								$valor['valorapagar'],
 								utf8_encode($valor['notafiscal']),
+								utf8_encode($valor['notafiscalapagar']),
 								utf8_encode($valor['observacao']),
+								utf8_encode($valor['medidas']),
 								(bool) $valor['foipaga'],
 								(float) $valor['numero'],
 								$this)
@@ -973,12 +989,17 @@ class Persistencia {
 			array_push($vetor_de_itens, 
 				new ItemContrato((int) $valor['idparcelaContrato'],
 								(int) $valor['idcontrato'],
+								$valor['idproduto'],
 								(float) $valor['valorbruto'],
 								utf8_encode($valor['datavencimento']),
 								utf8_encode($valor['datepagamento']),
+								utf8_encode($valor['dataprestacao']),
 								(float) $valor['deducoes'],
+								$valor['valorapagar'],
 								utf8_encode($valor['notafiscal']),
+								utf8_encode($valor['notafiscalapagar']),
 								utf8_encode($valor['observacao']),
+								utf8_encode($valor['medidas']),
 								(bool) $valor['foipaga'],
 								(float) $valor['numero'],
 								$this)

@@ -399,23 +399,33 @@ class Sistema {
 
 	public function criarItem(
 		int $id_contrato,
+		$id_produto,
 		float $valor_bruto,
 		string $data_vencimento,
 		$data_pagamento, // Pode ser string ou nulo
+		$data_prestacao,
 		float $deducoes,
+		$valor_a_pagar,
 		$nota_fiscal,
+		$nota_fiscal_a_pagar,
 		string $observacao,
+		$medidas,
 		bool $foi_paga,
 		int $numero)
 	{
 		$novoItem = new \Persistencia\ItemContrato(0,
 			$id_contrato,
+			$id_produto,
 			$valor_bruto,
 			$data_vencimento,
 			$data_pagamento,
+			$data_prestacao,
 			$deducoes,
+			$valor_a_pagar,
 			$nota_fiscal,
+			$nota_fiscal_a_pagar,
 			$observacao,
+			$medidas,
 			$foi_paga,
 			$numero,
 			$this->persistencia);
@@ -836,6 +846,17 @@ class Sistema {
 				return false;
 			}
 
+			if(array_key_exists('idProduto', $dados)) { //Pode ser nulo, evitando usar isset
+				if($dados['idProduto'] !== null && gettype($dados['idProduto']) !== 'integer') // Este valor só pode ser nulo ou inteiro
+					return false;
+
+				try {$item->setIdProduto($dados['idProduto']);}
+				catch (PersistenciaException $e) {
+					Logger::logar($e);
+					return false;
+				}
+			}
+
 			if(isset($dados['valorBruto'])) {
 				try {$item->setValorBruto((float) $dados['valorBruto']);}
 				catch (PersistenciaException $e) {
@@ -852,9 +873,21 @@ class Sistema {
 				}
 			}
 
-			if(isset($dados['dataPagamento'])) {
+			if(array_key_exists('dataPagamento', $dados)) {
 				if($dados['dataPagamento'] === '') $dados['dataPagamento'] = null;
 				try {$item->setDataPagamento($dados['dataPagamento']);}
+				catch (PersistenciaException $e) {
+					Logger::logar($e);
+					return false;
+				}
+			}
+
+			if(array_key_exists('dataPrestacao', $dados)) { //Pode ser nulo, evitando usar isset
+				if($dados['dataPrestacao'] !== null && gettype($dados['dataPrestacao']) !== 'string') // Este valor só pode ser nulo ou string
+					return false;
+
+				if($dados['dataPrestacao'] === '') $dados['dataPrestacao'] = null;
+				try {$item->setDataPrestacao($dados['dataPrestacao']);}
 				catch (PersistenciaException $e) {
 					Logger::logar($e);
 					return false;
@@ -869,6 +902,17 @@ class Sistema {
 				}
 			}
 
+			if(array_key_exists('valorAPagar', $dados)) { //Pode ser nulo, evitando usar isset
+				if($dados['valorAPagar'] !== null && gettype($dados['valorAPagar']) !== 'integer' && gettype($dados['valorAPagar']) !== 'double') // Este valor só pode ser nulo, inteiro ou double
+					return false;
+
+				try {$item->setValorAPagar($dados['valorAPagar']);}
+				catch (PersistenciaException $e) {
+					Logger::logar($e);
+					return false;
+				}
+			}
+
 			if(isset($dados['notaFiscal'])) {
 				try {$item->setNotaFiscal((string) $dados['notaFiscal']);}
 				catch (PersistenciaException $e) {
@@ -876,7 +920,18 @@ class Sistema {
 					return false;
 				}
 			}
-			
+
+			if(array_key_exists('notaFiscalAPagar', $dados)) { //Pode ser nulo, evitando usar isset
+				if($dados['notaFiscalAPagar'] !== null && gettype($dados['notaFiscalAPagar']) !== 'string') // Este valor só pode ser nulo ou string
+					return false;
+
+				try {$item->setNotaFiscalAPagar($dados['notaFiscalAPagar']);}
+				catch (PersistenciaException $e) {
+					Logger::logar($e);
+					return false;
+				}
+			}
+
 			if(isset($dados['observacao'])) {
 				try {$item->setObservacao((string) $dados['observacao']);}
 				catch (PersistenciaException $e) {
@@ -884,6 +939,18 @@ class Sistema {
 					return false;
 				}
 			}
+
+			if(array_key_exists('medidas', $dados)) { //Pode ser nulo, evitando usar isset
+				if($dados['medidas'] !== null && gettype($dados['medidas']) !== 'string') // Este valor só pode ser nulo ou string
+					return false;
+
+				try {$item->setMedidas($dados['medidas']);}
+				catch (PersistenciaException $e) {
+					Logger::logar($e);
+					return false;
+				}
+			}
+
 			if(isset($dados['numero'])) {
 				try {$item->setNumero((int) $dados['numero']);}
 				catch (PersistenciaException $e) {

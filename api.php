@@ -322,19 +322,24 @@ function criar($request) {
 	}
 	elseif($request['alvo'] === 'item') {
 		if(!checarParametrosItem($request['parametros'])) {
-			echo '{"status": "falha", "mensagem": "Parametro invalido passado"}';
+			echo '{"status": "falha", "mensagem": "Parâmetro invalido passado"}';
 			return false;
 		}
 		$r = $sistema->criarItem(
-				(int) $request['parametros']['idContrato'],
+				(int)	$request['parametros']['idContrato'],
+						$request['parametros']['idProduto'],
 				(float) $request['parametros']['valorBruto'],
-				(string) $request['parametros']['dataVencimento'],
-				$request['parametros']['dataPagamento'],
+				(string)$request['parametros']['dataVencimento'],
+						$request['parametros']['dataPagamento'],
+						$request['parametros']['dataPrestacao'],
 				(float) $request['parametros']['deducoes'],
-				(string) $request['parametros']['notaFiscal'],
-				(string) $request['parametros']['observacao'],
-				false, 
-				(int) $request['parametros']['numero']
+						$request['parametros']['valorAPagar'],
+				(string)$request['parametros']['notaFiscal'],
+						$request['parametros']['notaFiscalAPagar'],
+				(string)$request['parametros']['observacao'],
+						$request['parametros']['medidas'],
+						false, 
+				(int) 	$request['parametros']['numero']
 			);
 		if($r !== false)
 			echo '{"status": "sucesso", "idItem": '.$r.'}';
@@ -438,10 +443,15 @@ function checarParametrosContrato($p): bool {
 }
 function checarParametrosItem($p): bool {
 	if(!isset($p['idContrato'])) return false;
+	if(!array_key_exists('idProduto', $p)) return false;
 	if(!isset($p['valorBruto'])) return false;
 	if(!isset($p['dataVencimento'])) return false;
-	if(!isset($p['deducoes'])) return false;
+	if(!array_key_exists('dataPrestacao', $p)) return false;
+	if(!array_key_exists('deducoes', $p)) return false;
+	if(!array_key_exists('notaFiscalAPagar', $p)) return false;
+	if(!array_key_exists('valorAPagar', $p)) return false;
 	if(!isset($p['observacao'])) return false;
+	if(!array_key_exists('medidas', $p)) return false;
 	if(!isset($p['numero'])) return false;
 	return true;
 }

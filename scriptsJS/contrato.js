@@ -722,7 +722,7 @@ $scope.criarContrato = function() {
   ####### SUBSISTEMA CRIAÇÃO E EDIÇÃO DE ITENS DE CONTRATO #######
 _________________________________________________________________*/
   $scope.itemEditando = {}; // O item que estiver sendo editado será guardado aqui temporariamente.
-  $scope.eventListenerInserirItem = false; // O gatilho da tecla enter ainda não foi criado
+  $scope.eventListenerInserirItem = false; // O gatilho da tecla 'enter' ainda não foi criado
   $scope.mostrarItens = function(idContrato) {
 
     /*
@@ -738,7 +738,6 @@ _________________________________________________________________*/
 
     $scope.notaFiscalPreConfigurada = false; // removendo botão desnescesário da tela
 
-    var retorno = null;
     $scope.idContratoDosItens = idContrato;
 
     var comando = {
@@ -830,6 +829,7 @@ _________________________________________________________________*/
     $scope.itemEditando.numero++;
 
     $scope.itemEditando.dataVencimento = new Date();
+    $scope.itemEditando.dataPrestacao = new Date();
     $scope.itemEditando.func = 'Criar';
     $scope.itemEditando.Processando = false;
   }
@@ -844,13 +844,19 @@ _________________________________________________________________*/
     let temp = copiar($scope.itensBuscados[index]);
     temp.dataVencimento = fromData(temp.dataVencimento);
     temp.dataPagamento = fromData(temp.dataPagamento);
+    temp.dataPrestacao = fromData(temp.dataPrestacao);
+
     if(temp.notaFiscal !== null && temp.notaFiscal !== undefined && temp.notaFiscal !== '')// Caso a nota não tenha número definido, então não precisa preencher
       temp.notaFiscal = Number(temp.notaFiscal);
     else // Se a nota fiscal não possuir um valor válido...
       temp.notaFiscal = null; // ...Mantenha o valor vazio(null)
 
+    if(temp.produto.id !== null)
+      temp.produto.id = temp.produto.id.toString();
+
     $scope.itemEditando = temp;
     $scope.itemEditando.func = 'Salvar';
+
     $scope.rolarParaBaixo();
 
     return true;
@@ -862,19 +868,51 @@ _________________________________________________________________*/
     let dataPagamento = toData($scope.itemEditando.dataPagamento);
     if(dataPagamento != null) dataPagamento = dataPagamento.split('-').reverse().join('-');
     else dataPagamento = '';
+    let dataPrestacao = toData($scope.itemEditando.dataPrestacao);
+    if(dataPrestacao != null) dataPrestacao = dataPrestacao.split('-').reverse().join('-');
+    else dataPrestacao = '';
+
     let dataVencimento = toData($scope.itemEditando.dataVencimento);
     if(dataVencimento != null) dataVencimento = dataVencimento.split('-').reverse().join('-');
+
+    let medidas = '';
+    if($scope.itemEditando.medidas !== null && $scope.itemEditando.medidas !== undefined)
+      medidas = $scope.itemEditando.medidas;
+
+    let valorAPagar = null;
+    if($scope.itemEditando.valorAPagar !== null && $scope.itemEditando.valorAPagar !== undefined)
+      valorAPagar = Number($scope.itemEditando.valorAPagar);
+
+    let notaFiscalAPagar = '';
+    if($scope.itemEditando.notaFiscalAPagar !== null && $scope.itemEditando.notaFiscalAPagar !== undefined)
+      notaFiscalAPagar = $scope.itemEditando.notaFiscalAPagar;
+
     //O servidor não vai entender um parâmetro nulo, ao invés disso passando como string vazia
     if($scope.itemEditando.notaFiscal == null) $scope.itemEditando.notaFiscal = '';
+    let idProduto = null;
+    if($scope.itemEditando.produto.id !== null) {
+      idProduto = Number($scope.itemEditando.produto.id);
+      $scope.cache.listaProdutos.forEach(function(x) {
+        if(x.id == idProduto) {
+          $scope.itemEditando.produto.nome = x.nome;
+        }
+      });
+    }
 
     let item = {
       'idContrato': $scope.idContratoDosItens,
+      'idProduto': idProduto,
+      'produto': $scope.itemEditando.produto,
       'valorBruto': $scope.itemEditando.valorBruto,
       'dataVencimento': dataVencimento,
       'dataPagamento': dataPagamento,
+      'dataPrestacao': dataPrestacao,
       'deducoes': $scope.itemEditando.deducoes,
+      'valorAPagar': valorAPagar,
       'notaFiscal': $scope.itemEditando.notaFiscal,
+      'notaFiscalAPagar': notaFiscalAPagar,
       'observacao': $scope.itemEditando.observacao,
+      'medidas': medidas,
       'numero': $scope.itemEditando.numero
     },
     comando = {};
@@ -927,8 +965,11 @@ _________________________________________________________________*/
                 else
                   item.corVencimento = 'white';
               }
+
               if(item.notaFiscal === undefined || item.notaFiscal === null) item.notaFiscal = '';
-              $scope.itensBuscados.push(item); // Se adiantando e inserindo o item antes mesmo da função mostrarItem terminar
+              if(item.notaFiscalAPagar === undefined || item.notaFiscalAPagar === null) item.notaFiscalAPagar = '';
+
+              $scope.itensBuscados.push(item);
               $scope.resetarPainelEditarItem();
 
             }
@@ -952,8 +993,11 @@ _________________________________________________________________*/
                 else
                   item.corVencimento = 'white';
               }
+
               if(item.notaFiscal === undefined || item.notaFiscal === null) item.notaFiscal = '';
-              $scope.itensBuscados[index] = item; // Se adiantando e inserindo o item antes mesmo da função mostrarItem terminar
+              if(item.notaFiscalAPagar === undefined || item.notaFiscalAPagar === null) item.notaFiscalAPagar = '';
+
+              $scope.itensBuscados[index] = item;
 
             }
             return true;
@@ -1060,8 +1104,7 @@ _________________________________________________________________*/
       'id': item.idParcelaContrato,
       'parametros': {
         'notaFiscal': $scope.notaFiscalConfigurada.numero,
-        'dataVencimento': dataFormatada,
-        'dataPagamento': item.dataPagamento
+        'dataVencimento': dataFormatada
       }
     };
 
