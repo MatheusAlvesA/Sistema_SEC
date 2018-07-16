@@ -959,6 +959,9 @@ class Persistencia {
 			case (Relatorio::NOTAFISCAL):
 				return $this->getItensDaNotaFiscal($opcional);
 			break;
+			case (Relatorio::APAGAR):
+				return $this->getItensDoMes($opcional);
+			break;
 
 			default:
 				$e = new PersistenciaException("Código de relatório desconhecido");
@@ -968,13 +971,68 @@ class Persistencia {
 		}
 	}
 
+	public function getItensDoMes(array $data): array {
+		$ano = (int) $data['ano'];
+		$mes = (int) $data['mes'];
+		$proximoMes = ((int)$data['mes'])+1;
+
+		if($proximoMes > 12) {
+			$ano++;
+			$proximoMes = 1;
+		}
+
+		$consulta = $this->con->prepare('SELECT * FROM parcelacontrato WHERE 
+	        	(`dataprestacao` IS NOT NULL
+	            AND (`dataprestacao` >= DATE("'.$ano.'-'.$mes.'-01"))
+	            AND (`dataprestacao` < DATE("'.$ano.'-'.$proximoMes.'-01"))
+	            )'); // preparando
+
+
+		$sucesso = $consulta->execute(); // executando
+
+		if(!$sucesso) {
+			$e = new PersistenciaException("Não foi possível obter os itens do mês");
+			$e->setEstado(
+				'Data: '.json_encode($data).', '.
+				'PDOStatement::errorInfo: '.json_encode( $consulta->errorInfo() )
+			);
+			throw $e;
+		}
+
+		$rs = $consulta->fetchAll(); //extraindo a matriz de resultados
+
+		$vetor_de_itens = [];
+		foreach ($rs as $chave => $valor) {
+			array_push($vetor_de_itens, 
+				new ItemContrato((int) $valor['idparcelaContrato'],
+								(int) $valor['idcontrato'],
+								$valor['idproduto'],
+								(float) $valor['valorbruto'],
+								utf8_encode($valor['datavencimento']),
+								utf8_encode($valor['datepagamento']),
+								utf8_encode($valor['dataprestacao']),
+								(float) $valor['deducoes'],
+								$valor['valorapagar'],
+								utf8_encode($valor['notafiscal']),
+								utf8_encode($valor['notafiscalapagar']),
+								utf8_encode($valor['observacao']),
+								utf8_encode($valor['medidas']),
+								(bool) $valor['foipaga'],
+								(float) $valor['numero'],
+								$this)
+			);
+		}
+
+		return $vetor_de_itens;
+	}
+
 	public function getItensDaNotaFiscal(int $numero): array {
 		$consulta = $this->con->prepare('SELECT * FROM parcelacontrato WHERE notafiscal=:n;'); // preparando
 
 		$sucesso = $consulta->execute(['n'=>$numero]); // executando
 
 		if(!$sucesso) {
-			$e = new PersistenciaException("Não obter os itens da nota fiscal");
+			$e = new PersistenciaException("Não foi possível obter os itens da nota fiscal");
 			$e->setEstado(
 				'Numero: '.$numero.', '.
 				'PDOStatement::errorInfo: '.json_encode( $consulta->errorInfo() )

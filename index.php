@@ -92,6 +92,7 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
       <div class="list-group">
         <b class="list-group-item list-group-item-light" data-toggle="collapse" data-target="#painelRelatorios">Relatórios</b>
         <div id="painelRelatorios">
+          <a href="#!relatorioAPagar" class="list-group-item list-group-item-dark">A Pagar</a>
           <a href="#!relatorioGraficos" class="list-group-item list-group-item-dark">Gráficos</a>
           <a href="#!relatorioClientes" class="list-group-item list-group-item-dark">Clientes</a>
           <a href="#!relatorioNotaFiscal" class="list-group-item list-group-item-dark">Nota Fiscal</a>
@@ -120,7 +121,6 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
     }
   }
   inicializarMenuLateral();
-
 </script>
 
 <script type="text/javascript" src="scriptsJS/main.js"></script>
@@ -138,6 +138,7 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
 <script type="text/javascript" src="scriptsJS/relatorioClientesInativos.js"></script>
 <script type="text/javascript" src="scriptsJS/relatorioGraficos.js"></script>
 <script type="text/javascript" src="scriptsJS/relatorioNotaFiscal.js"></script>
+<script type="text/javascript" src="scriptsJS/relatorioAPagar.js"></script>
 
 </body>
 </html>

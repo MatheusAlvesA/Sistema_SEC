@@ -5,5 +5,6 @@ class Relatorio {
     const INADIMPLENTES = 2;
     const itensPagosNosUltimos12Meses = 3;
     const NOTAFISCAL = 4;
+    const APAGAR = 5;
 }
 ?>

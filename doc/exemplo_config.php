@@ -6,7 +6,7 @@
     const SQL_pass = "";      // Senha de acesso ao banco
     const SQL_db = "secnatal";    // Banco contendo os dados
 
-    const VERCAO = "v0.8.5";      // Versão do código atual
+    const VERCAO = "v0.9";      // Versão do código atual
     const CORS = false;       // Permitir ou não o uso de cross origin domain
     const EXIBIR_ERROS = true;    // Exibir erros do PHP. Recomendável: true para devenvolvimento e false para produção
     const USAR_CDN = false; // Se deve ou não usar CDN para acesso aos css, js e fonts

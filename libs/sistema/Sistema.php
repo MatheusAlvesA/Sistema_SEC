@@ -204,7 +204,32 @@ class Sistema {
 		return $acumulador;
 	}
 
-	public function listarServicosFinalizadosUltimos12Meses() { //todo
+	public function listarServicosPrestados(array $mes) {
+		$mes['mes'] = (int) $mes['mes'];
+		$mes['ano'] = (int) $mes['ano'];
+		if($mes['mes'] > 12 || $mes['mes'] < 1)
+			return [];
+		if($mes['ano'] > ((int)date('Y')+10) || $mes['ano'] < 1000)
+			return [];
+
+		try {
+			$r = $this->persistencia->getRelatorio(Relatorio::APAGAR, $mes);
+		} catch (PersistenciaException $e) {
+			Logger::logar($e);
+			return [];
+		}
+		// Processando dados
+		$retorno = [];
+		foreach ($r as $chave => $valor) {
+			$elemento = $valor->toArray();
+			$elemento['cliente'] = $valor->getContrato()->getNomeCliente(); //todo
+			array_push($retorno, $elemento);
+		}
+
+		return $retorno;
+	}
+
+	public function listarServicosFinalizadosUltimos12Meses() {
 		try {
 			$r = $this->persistencia->getRelatorio(Relatorio::itensPagosNosUltimos12Meses);
 		} catch (PersistenciaException $e) {

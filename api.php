@@ -415,6 +415,13 @@ function relatorio($request) {
 			echo json_encode($sistema->listarItensNotaFiscal((int)$request['numero']));
 			break;
 
+		case 'APagar':
+			if(gettype($request['parametros']) !== 'array')
+				echo '{"status": "falha", "mensagem": "Parâmetros incorretos"}';
+
+			echo json_encode($sistema->listarServicosPrestados($request['parametros']));
+			break;
+
 		default:
 			echo '{"status": "falha", "mensagem": "Alvo desconhecido para o comando relatorio"}';
 			break;

@@ -46,6 +46,9 @@
       })
       .when("/relatorioNotaFiscal", {
           templateUrl : "rotas/relatorioNotaFiscal.html"
+      })
+      .when("/relatorioAPagar", {
+          templateUrl : "rotas/relatorioAPagar.html"
       });
   });
 
