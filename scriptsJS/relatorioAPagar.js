@@ -6,6 +6,8 @@ $scope.listaBKP = [];
 $scope.listaProdutosFiltrada = [];
 $scope.mesBKP = null;
 $scope.anoBKP = null;
+$scope.nNotas = 0;
+$scope.somaValor = 0;
 $scope.baixarRelatorio = function() {
   if($scope.mes === $scope.mesBKP && $scope.ano === $scope.anoBKP) { // Não alterada a data desde a ultima requisição
     $scope.aplicarFiltroProduto();
@@ -133,13 +135,15 @@ $scope.submeterNota = function(id) {
             setTimeout(function(){item.tableClasse = '';}, 700);
             return false;
           }
+          $scope.nNotas++;
+          $scope.somaValor += Number(item.valorAPagar);
           item.tableClasse = 'table-success';
         },
         function (dados) {  // callback, falha na conexão do servidor
           item.notaFiscalAPagar = '';
         }
     );
-}
+};
 
 $scope.mesEscolhidoOnString = function() {
   let num = Number($scope.mes);
