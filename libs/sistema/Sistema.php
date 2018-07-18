@@ -220,11 +220,8 @@ class Sistema {
 		}
 		// Processando dados
 		$retorno = [];
-		foreach ($r as $chave => $valor) {
-			$elemento = $valor->toArray();
-			$elemento['cliente'] = $valor->getContrato()->getNomeCliente(); //todo
-			array_push($retorno, $elemento);
-		}
+		foreach ($r as $chave => $valor)
+			array_push($retorno, $valor->toArray());
 
 		return $retorno;
 	}

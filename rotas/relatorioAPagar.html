@@ -68,7 +68,6 @@
   	  <table class="table table-hover table-responsive-sm">
 	    <thead>
 	      <tr>
-	        <th>Nome</th>
 	        <th>Serviço</th>
 	        <th>Medidas</th>
 	        <th>Prestação</th>
@@ -79,8 +78,7 @@
 	    </thead>
 	    <tbody>
 	      <tr ng-repeat="x in lista track by x.idParcelaContrato">
-	        <td title="Nome" 			style="width: 20%;">{{x.cliente}}</td>
-	        <td title="Serviço" 		style="width: 20%;">{{x.observacao}}</td>
+	        <td title="Serviço" 		style="width: 40%;">{{x.observacao}}</td>
 	        <td title="Medidas" 		style="width: 10%;">{{x.medidas}}</td>
 	        <td title="Data Prestação" 	style="width: 10%;">{{x.dataPrestacao | dataBR}}</td>
 	        <td title="Valor a pagar" 	style="width: 10%;">{{x.valorAPagar | dinheiro}}</td>
