@@ -129,8 +129,13 @@ app.filter('dinheiro', function() {
 
 app.filter('dataBR', function() {
     return function(valor) {
+        if(typeof valor == 'object' && valor !== null) // Deve ser um objeto 'Date'
+          valor = (valor.getFullYear().toString()) + '-' + ((valor.getMonth()+1).toString()) + '-' + (valor.getDate().toString()) ;
+
         if(valor === undefined || valor === null || typeof valor != 'string') return '';
-        let vetor  = valor.split('-'); // separando os elementos
+
+        let vetor = valor.split('T')[0];
+        vetor  = valor.split('-'); // separando os elementos
         let doisDigitos = vetor.map(function (x) { // aplicando um zero a esquerda dos elementos que só tiverem um digito
           if(x.length == 1)
             return '0'+x;

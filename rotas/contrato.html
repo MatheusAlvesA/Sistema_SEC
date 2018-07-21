@@ -131,20 +131,47 @@
   			<h4>{{nomeClienteSelecionado}}</h4>
   		</div>
   	</div>
+  	<hr>
+
+	<div class="form-group row">
+		<div class="col-sm-2">
+			<b ng-repeat="x in listaProdutosString" style="font-size: 8pt;">{{x}}<br></b>
+		</div>
+		<div class="col-sm-10">
+			<textarea class="form-control" ng-model="contratoSelecionado.observacao" rows="5" readonly></textarea>
+		</div>
+	</div>
+
   	<div class="row">
   		<div class="col-sm-3">
-  			<b>Total de itens: {{itensTotal}}</b>
+  			<b>Emissão do Contrato:<br></b>{{contratoSelecionado.dataEmissao | dataBR}}
   		</div>
   		<div class="col-sm-3">
-  			<b>Valor total: {{itensSomaValor | dinheiro}}</b>
+  			<b>Inicio do Contrato:<br></b>{{contratoSelecionado.dataInicial | dataBR}}
   		</div>
   		<div class="col-sm-3">
-  			<b>Dívida: {{itensSomaDivida | dinheiro}}</b>
+  			<b>Vencimento do Contrato:<br></b>{{contratoSelecionado.dataFinal | dataBR}}
   		</div>
    		<div class="col-sm-3">
-  			<b>Parcelas vencidas: {{itensVencidos}}</b>
+  			<b>Cancelamento do Contrato:<br></b>{{contratoSelecionado.dataCancelamento | dataBR}}
   		</div>
   	</div>
+  	<hr>
+  	<div class="row">
+  		<div class="col-sm-3">
+  			<b>Valor do Contrato:<br></b>{{contratoSelecionado.valorTotal}}
+  		</div>
+  		<div class="col-sm-3">
+  			<b>Valor utilizado:<br></b>{{contratoSelecionado.valorUtilizado | dinheiro}}
+  		</div>
+  		<div class="col-sm-3">
+  			<b>Saldo restante:<br></b>{{contratoSelecionado.saldoDisponivel | dinheiro}}
+  		</div>
+   		<div class="col-sm-3">
+  			<b>Parcelas vencidas:</b> {{itensVencidos}}<br>{{itensSomaDivida | dinheiro}}
+  		</div>
+  	</div>
+  	<hr>
   	<div class="row">
   		<div class="col-sm-2">
   			<button class="bnt btn-success btn-sm float-left" style="cursor: pointer;" ng-click="voltarItens2Contratos()">Voltar</button>

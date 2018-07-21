@@ -185,6 +185,7 @@ __________________________________________________________*/
   $scope.contratoSelecionado = {}; // guarda o contrato que foi escolhido para ser editado pelo usuário
   $scope.contratoSelecionadoBACKUP = {}; // Um back up servirá para detectar se o contratoSelecionado foi editado pelo usuário ao realizar update
   $scope.estadoBuscando = false;
+  $scope.listaProdutosString = []; // Guarda a lista de subprodutos de um contrato, mas na forma de um vetor de strings. cada string é o nome do subproduto
   $scope.limparCamposBusca = function() {
     $scope.busca_nome_cliente = null;
     $scope.busca_contrato_inicio = null;
@@ -551,6 +552,15 @@ $scope.listarModificacoesContrato = function() {
   $("#telaEdicao_mensageiro").val($scope.contratoSelecionado.idMensageiro);
   $("#telaEdicao_tipoAcesso").val($scope.contratoSelecionado.idTipoAcesso);
 
+  $scope.listaProdutosString = $scope.cache.listaProdutos.filter(function (x) {
+    for(let loop = 0; loop < $scope.contratoSelecionado.idsProdutos.length; loop++) {
+      if($scope.contratoSelecionado.idsProdutos[loop] == x.id)
+        return true;
+    }
+    return false;
+  });
+  $scope.listaProdutosString = $scope.listaProdutosString.map(function (x) {return x.nome;});
+
   $scope.contratoSelecionadoBACKUP = copiar($scope.contratoSelecionado);
  };
 
@@ -724,7 +734,7 @@ _________________________________________________________________*/
   $scope.itemEditando = {}; // O item que estiver sendo editado será guardado aqui temporariamente.
   $scope.eventListenerInserirItem = false; // O gatilho da tecla 'enter' ainda não foi criado
   $scope.mostrarItens = function(idContrato) {
-
+    $scope.setContrato($scope.buscarContratoID(idContrato)); // Armazenando informações do contrato referente a estes itens
     /*
       Adicionando listener de evento para inserir apertando enter
     */
@@ -796,7 +806,8 @@ _________________________________________________________________*/
       function(valorAnterior, valorAtual) {
         var d = new Date();
         var vencimento = new Date(valorAtual.dataVencimento);
-        if(d >= vencimento && valorAtual.dataPagamento == "")
+
+        if(d >= vencimento && (valorAtual.dataPagamento == "" || valorAtual.dataPagamento == null))
           return valorAnterior+(valorAtual.valorBruto-valorAtual.deducoes);
         else
           return valorAnterior;
