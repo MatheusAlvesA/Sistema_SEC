@@ -396,8 +396,8 @@
           	<div class="form-group row">
 			    <label for="telaEdicao_servico" class="col-2 col-form-label">Serviços:</label>
 			    <div class="col-10">
-				    <select multiple class="form-control" id="telaEdicao_servico" style="height: {{cache.listaProdutos.length*17}}pt;">
-				      <option ng-repeat="x in cache.listaProdutos" value="{{x.id}}">{{x.nome}}</option>
+				    <select multiple class="form-control" id="telaEdicao_servico" style="height: {{listaProdutosFiltradaEdicao.length*17}}pt;">
+				      <option ng-repeat="x in listaProdutosFiltradaEdicao" value="{{x.id}}">{{x.nome}}</option>
 				    </select>
 			    </div>
 			</div>
@@ -565,11 +565,11 @@
 	    <input class="form-control" type="number" step="0.01" ng-model="contratoCriando.valorTotal" id="telaCriacao_valor_total">
 	  </div>
 	</div>
-         <div class="form-group row">
+    <div class="form-group row">
 	    <label for="telaCriacao_servico" class="col-2 col-form-label">Serviços:</label>
 	    <div class="col-10">
-		    <select multiple class="form-control" id="telaCriacao_servico" style="height: {{cache.listaProdutos.length*17}}pt;">
-		      <option ng-repeat="x in cache.listaProdutos" value="{{x.id}}">{{x.nome}}</option>
+		    <select multiple class="form-control" id="telaCriacao_servico" style="height: {{listaProdutosFiltradaCriacao.length*17}}pt;">
+		      <option ng-repeat="x in listaProdutosFiltradaCriacao" value="{{x.id}}">{{x.nome}}</option>
 		    </select>
 	    </div>
 	</div>

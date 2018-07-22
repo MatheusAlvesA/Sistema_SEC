@@ -147,6 +147,12 @@ $scope.inicializarCache = function() {
             return false;
           }
           $scope.cache.listaProdutos = dados.data.sort(function(a,b){return a.nome.localeCompare(b.nome);});
+          // Caso as categorias já estejam carregadas
+          if($scope.cache.listaCategoriasProduto != undefined && $scope.cache.listaCategoriasProduto != null && $scope.cache.listaCategoriasProduto.length >= 1) {
+            // Executando essa função de novo caso tenha falhado quando foi chamada antes
+            $scope.setCategoriaProdutoCriacao($scope.cache.listaCategoriasProduto[0].id);
+            $scope.setCategoriaProdutoEdicao($scope.cache.listaCategoriasProduto[0].id);
+          }
         },
         function (dados) {  // callback, falha na conexão do servido
           $scope.erroFatal();
@@ -168,6 +174,23 @@ $scope.inicializarCache = function() {
             return false;
           }
           $scope.cache.listaCategoriasProduto = dados.data;
+          if($scope.cache.listaCategoriasProduto.length >= 1) { // Existem uma ou mais categorias
+
+            $scope.setCategoriaProdutoCriacao($scope.cache.listaCategoriasProduto[0].id);
+            let select = document.getElementById("telaCriacao_categoria");
+            select.onchange = function (event) {
+              $scope.setCategoriaProdutoCriacao( event.target.value );
+              if(!$scope.$$phase) $scope.$digest();
+            };
+
+            $scope.setCategoriaProdutoEdicao($scope.cache.listaCategoriasProduto[0].id);
+            select = document.getElementById("telaEdicao_categoria");
+            select.onchange = function (event) {
+              $scope.setCategoriaProdutoEdicao( event.target.value );
+              if(!$scope.$$phase) $scope.$digest();
+            };
+
+          }
         },
         function (dados) {  // callback, falha na conexão do servido
           $scope.erroFatal();
@@ -548,6 +571,8 @@ $scope.listarModificacoesContrato = function() {
   $("#telaEdicao_nome_cliente").val($scope.contratoSelecionado.idCliente);
   $("#telaEdicao_servico").val($scope.contratoSelecionado.idsProdutos);
   $("#telaEdicao_categoria").val($scope.contratoSelecionado.idCategoria);
+  $scope.setCategoriaProdutoEdicao($scope.contratoSelecionado.idCategoria);
+  if(!$scope.$$phase) $scope.$digest();
   $("#telaEdicao_funcionario").val($scope.contratoSelecionado.idFuncionario);
   $("#telaEdicao_mensageiro").val($scope.contratoSelecionado.idMensageiro);
   $("#telaEdicao_tipoAcesso").val($scope.contratoSelecionado.idTipoAcesso);
@@ -713,6 +738,31 @@ $scope.criarContrato = function() {
         return false;
       }
   );
+};
+
+$scope.listaProdutosFiltradaCriacao = [];
+$scope.setCategoriaProdutoCriacao = function(id) {
+  if($scope.cache.listaProdutos == null || $scope.cache.listaProdutos == undefined) // A lista de produtos não está carregada ainda
+    return false;
+
+  $scope.listaProdutosFiltradaCriacao = $scope.cache.listaProdutos.filter(function (produto) {
+    if(produto.idCategoria == id) return true;
+    else                          return false;
+  });
+
+  return true;
+};
+$scope.listaProdutosFiltradaEdicao = [];
+$scope.setCategoriaProdutoEdicao = function(id) {
+  if($scope.cache.listaProdutos == null || $scope.cache.listaProdutos == undefined) // A lista de produtos não está carregada ainda
+    return false;
+
+  $scope.listaProdutosFiltradaEdicao = $scope.cache.listaProdutos.filter(function (produto) {
+    if(produto.idCategoria == id) return true;
+    else                          return false;
+  });
+
+  return true;
 };
 
   /*
