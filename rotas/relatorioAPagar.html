@@ -68,6 +68,7 @@
   	  <table class="table table-hover table-responsive-sm">
 	    <thead>
 	      <tr>
+	      	<th>Cliente</th>
 	        <th>Serviço</th>
 	        <th>Medidas</th>
 	        <th>Prestação</th>
@@ -78,11 +79,12 @@
 	    </thead>
 	    <tbody>
 	      <tr ng-repeat="x in lista track by x.idParcelaContrato">
-	        <td title="Serviço" 		style="width: 35%;">{{x.observacao}}</td>
+	      	<td title="Nome Cliente" 	style="width: 20%;">{{x.nomeCliente}}</td>
+	        <td title="Serviço" 		style="width: 20%;">{{x.observacao}}</td>
 	        <td title="Medidas" 		style="width: 10%;">{{x.medidas}}</td>
 	        <td title="Data Prestação" 	style="width: 10%;">{{x.dataPrestacao | dataBR}}</td>
 	        <td title="Valor a pagar" 	style="width: 10%;">{{x.valorAPagar | dinheiro}}</td>
-	        <td title="Produto" 		style="width: 20%;">{{x.produto.nome}}</td>
+	        <td title="Produto" 		style="width: 15%;">{{x.produto.nome}}</td>
 	        <td title="Nota fiscal" 	style="width: 15%;" class="{{x.tableClasse}}">
 	        	<form ng-submit="submeterNota(x.idParcelaContrato)">
 				    <div class="form-group row">

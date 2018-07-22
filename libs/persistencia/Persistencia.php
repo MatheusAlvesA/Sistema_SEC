@@ -981,30 +981,33 @@ class Persistencia {
 			$proximoMes = 1;
 		}
 
-		$consulta = $this->con->prepare('SELECT * FROM parcelacontrato WHERE 
+		$consultaItens = $this->con->prepare('SELECT * FROM parcelacontrato WHERE 
 	        	(`dataprestacao` IS NOT NULL
 	            AND (`dataprestacao` >= DATE("'.$ano.'-'.$mes.'-01"))
 	            AND (`dataprestacao` < DATE("'.$ano.'-'.$proximoMes.'-01"))
-	            )'); // preparando
+	            )');
+		$consultaContrato = $this->con->prepare('SELECT idcliente FROM contrato WHERE idcontrato = :idcontrato;');
+		$consultaCliente = $this->con->prepare('SELECT nomecliente FROM cliente WHERE idcliente = :idcliente;');
 
-
-		$sucesso = $consulta->execute(); // executando
+		$sucesso = $consultaItens->execute(); // executando
 
 		if(!$sucesso) {
 			$e = new PersistenciaException("Não foi possível obter os itens do mês");
 			$e->setEstado(
 				'Data: '.json_encode($data).', '.
-				'PDOStatement::errorInfo: '.json_encode( $consulta->errorInfo() )
+				'PDOStatement::errorInfo: '.json_encode( $consultaItens->errorInfo() )
 			);
 			throw $e;
 		}
 
-		$rs = $consulta->fetchAll(); //extraindo a matriz de resultados
+		$rs = $consultaItens->fetchAll(); //extraindo a matriz de resultados
 
 		$vetor_de_itens = [];
 		foreach ($rs as $chave => $valor) {
-			array_push($vetor_de_itens, 
-				new ItemContrato((int) $valor['idparcelaContrato'],
+			$consultaContrato->execute([ 'idcontrato' => $valor['idcontrato'] ]);
+			$consultaCliente->execute([ 'idcliente' => $consultaContrato->fetchAll()[0]['idcliente'] ]);
+
+			$item = (new ItemContrato((int) $valor['idparcelaContrato'],
 								(int) $valor['idcontrato'],
 								$valor['idproduto'],
 								(float) $valor['valorbruto'],
@@ -1019,8 +1022,10 @@ class Persistencia {
 								utf8_encode($valor['medidas']),
 								(bool) $valor['foipaga'],
 								(float) $valor['numero'],
-								$this)
-			);
+								$this))->toArray();
+			$item['nomeCliente'] = utf8_encode( $consultaCliente->fetchAll()[0]['nomecliente'] );
+
+			array_push($vetor_de_itens, $item);
 		}
 
 		return $vetor_de_itens;

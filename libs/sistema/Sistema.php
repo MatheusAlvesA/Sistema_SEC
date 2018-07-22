@@ -212,16 +212,13 @@ class Sistema {
 		if($mes['ano'] > ((int)date('Y')+10) || $mes['ano'] < 1000)
 			return [];
 
+		$retorno = [];
 		try {
-			$r = $this->persistencia->getRelatorio(Relatorio::APAGAR, $mes);
+			$retorno = $this->persistencia->getRelatorio(Relatorio::APAGAR, $mes);
 		} catch (PersistenciaException $e) {
 			Logger::logar($e);
 			return [];
 		}
-		// Processando dados
-		$retorno = [];
-		foreach ($r as $chave => $valor)
-			array_push($retorno, $valor->toArray());
 
 		return $retorno;
 	}
