@@ -162,7 +162,7 @@
   			<b>Valor do Contrato:<br></b>{{contratoSelecionado.valorTotal}}
   		</div>
   		<div class="col-sm-3">
-  			<b>Valor utilizado:<br></b>{{contratoSelecionado.valorUtilizado | dinheiro}}
+  			<b>Saldo utilizado:<br></b>{{contratoSelecionado.valorUtilizado | dinheiro}}
   		</div>
   		<div class="col-sm-3">
   			<b>Saldo restante:<br></b>{{contratoSelecionado.saldoDisponivel | dinheiro}}
@@ -419,18 +419,16 @@
 			  </div>
 			</div>
 			<div class="form-group row">
-			  <label for="telaEdicao_valor_total" class="col-2 col-form-label">Valor Total:</label>
-			  <div class="col-4">
+			  <div class="col-3 offset-2">
+			  	<label for="telaEdicao_valor_total">Valor do contrato:</label>
 			    <input class="form-control" type="text" ng-model="contratoSelecionado.valorTotal" id="telaEdicao_valor_total">
 			  </div>
-			 </div>
-			<div class="form-group row">
-			  <label class="col-2 col-form-label">Utilizado:</label>
-			  <div class="col-4">
+			  <div class="col-3 offset-1">
+			  	<label>Saldo Utilizado:</label>
 			    <input class="form-control" type="text" value="{{contratoSelecionado.valorUtilizado | dinheiro}}" disabled>
 			  </div>
-			  <label class="col-2 col-form-label">Disponível:</label>
-			  <div class="col-4">
+			  <div class="col-3">
+			  	<label>Saldo Disponível:</label>
 			    <input class="form-control" type="text" value="{{contratoSelecionado.saldoDisponivel | dinheiro}}" disabled>
 			  </div>
 			</div>
