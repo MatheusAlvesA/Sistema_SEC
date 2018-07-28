@@ -207,7 +207,7 @@ __________________________________________________________*/
   $scope.listaContratos = []; // sempre guarda a lista de contratos retornados pela API na ultima requisição
   $scope.contratoSelecionado = {}; // guarda o contrato que foi escolhido para ser editado pelo usuário
   $scope.contratoSelecionadoBACKUP = {}; // Um back up servirá para detectar se o contratoSelecionado foi editado pelo usuário ao realizar update
-  $scope.estadoBuscando = false;
+  $scope.estadoBuscando = false; //Guarda se o sistema está executando uma busca
   $scope.listaProdutosString = []; // Guarda a lista de subprodutos de um contrato, mas na forma de um vetor de strings. cada string é o nome do subproduto
   $scope.limparCamposBusca = function() {
     $scope.busca_nome_cliente = null;
