@@ -321,7 +321,7 @@ else echo 'Nenhum erro registrado';
   }
 
 function uparBanco() {
-  if($_FILES['arquivoBanco']['error']) {header("location: configuracao.php?upBanco=2");exit();}
+  if($_FILES['arquivoBanco']['error']) {header("location: configuracao.php?upBanco=2&erroCod=".$_FILES['arquivoBanco']['error']);exit();}
 
   if(move_uploaded_file($_FILES['arquivoBanco']['tmp_name'], 'banco.tmp')) {
     system('mysql -h '.Config::SQL_host.' -u '.Config::SQL_user.' -p'.Config::SQL_pass.' '.Config::SQL_db.' < banco.tmp');
