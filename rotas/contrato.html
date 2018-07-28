@@ -194,8 +194,8 @@
 	        <th>Valor</th>
 	        <th>Desconto</th>
 	        <th>Nota</th>
-	        <th>Produto</th>
 	        <th>Serviço</th>
+	        <th>Descrição</th>
 	        <th>Ações</th>
 	      </tr>
 	    </thead>
@@ -208,8 +208,8 @@
 	        <td data-toggle="tooltip" data-placement="top" title="Valor R$">{{x.valorBruto | dinheiro}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Deduções">{{x.deducoes | dinheiro}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Nº Nota Fiscal">{{x.notaFiscal}}</td>
-	        <td data-toggle="tooltip" data-placement="top" title="Produto">{{x.produto.nome}}</td>
-	        <td data-toggle="tooltip" data-placement="top" title="Serviço">{{x.observacao}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Serviço">{{x.produto.nome}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Descrição">{{x.observacao}}</td>
 	        <td>
 	        	<span style="font-size: 15pt;cursor: pointer;" ng-click="editarParcela(x.idParcelaContrato)" class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Editar item"></span>-<span style="font-size: 15pt; cursor: pointer; color: red;" ng-click="deletarParcela(x.idParcelaContrato)" class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Apagar item"></span>
 	        	<br>
@@ -278,7 +278,7 @@
   		</div>
    		<div class="col-sm-4">
  			<div class="form-group">
-				<label for="ItemEditDataPagamento">Produto:</label>
+				<label for="ItemEditDataPagamento">Serviço:</label>
 				<select class="form-control" id="ItemEditProduto" ng-model="itemEditando.produto.id">
 				  <option ng-repeat="x in cache.listaProdutos" value="{{x.id}}">{{x.nome}}</option>
 				</select>

@@ -24,7 +24,7 @@
 				  <option value="12">DEZEMBRO</option>
 				</select>
 			</div>
-			<label class="col-1 col-form-label">Produto:</label>
+			<label class="col-1 col-form-label">Serviço:</label>
 			<div class="col-3">
 				<select multiple class="form-control" ng-model='listaProdutosFiltrada'>
 				  <option ng-repeat="x in listaSubProdutos" value="{{x.id}}">{{x.nome}}</option>
@@ -69,22 +69,22 @@
 	    <thead>
 	      <tr>
 	      	<th>Cliente</th>
-	        <th>Serviço</th>
+	        <th>Descrição</th>
 	        <th>Medidas</th>
 	        <th>Prestação</th>
 	        <th>A pagar</th>
-	        <th>Produto</th>
+	        <th>Serviço</th>
 	        <th>Nota fiscal</th>
 	      </tr>
 	    </thead>
 	    <tbody>
 	      <tr ng-repeat="x in lista track by x.idParcelaContrato">
 	      	<td title="Nome Cliente" 	style="width: 20%;">{{x.nomeCliente}}</td>
-	        <td title="Serviço" 		style="width: 20%;">{{x.observacao}}</td>
+	        <td title="Descrição" 		style="width: 20%;">{{x.observacao}}</td>
 	        <td title="Medidas" 		style="width: 10%;">{{x.medidas}}</td>
 	        <td title="Data Prestação" 	style="width: 10%;">{{x.dataPrestacao | dataBR}}</td>
 	        <td title="Valor a pagar" 	style="width: 10%;">{{x.valorAPagar | dinheiro}}</td>
-	        <td title="Produto" 		style="width: 15%;">{{x.produto.nome}}</td>
+	        <td title="Serviço" 		style="width: 15%;">{{x.produto.nome}}</td>
 	        <td title="Nota fiscal" 	style="width: 15%;" class="{{x.tableClasse}}">
 	        	<form ng-submit="submeterNota(x.idParcelaContrato)">
 				    <div class="form-group row">

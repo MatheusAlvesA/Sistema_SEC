@@ -369,7 +369,7 @@ _________________________________________________________________*/
 
 $scope.deletarContrato = function() {
 
-  if(!confirm("Tem certeza que quer deletar esse contrato?")) return false;
+  if(!confirm("ATENÇÃO !!!\nTem certeza que quer deletar esse contrato?\n\nEsta ação é irreversível")) return false;
 
   var comando = {
       'comando': 'deletar',

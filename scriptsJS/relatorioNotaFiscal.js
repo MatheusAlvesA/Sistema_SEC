@@ -2,6 +2,7 @@ app.controller("relatorioNotaFiscalCtrl", function($scope, requisitarAPI, relato
 
 
 $scope.itensBuscados = [];
+$scope.somaTotal = 0.00;
 $scope.baixarRelatorio = function() {
   if($scope.NumeroNota === null || $scope.NumeroNota === '' || $scope.NumeroNota === undefined) return false;
 
@@ -25,6 +26,7 @@ $scope.baixarRelatorio = function() {
           $scope.itensBuscados = dados.data.itens;
           $scope.nomeCliente = dados.data.cliente;
           $scope.aplicarCores();
+          $scope.calcularSoma();
           $('#plotDados').css({'display': 'block'});
           return true
         },
@@ -52,8 +54,15 @@ $scope.exibirErro = function(elemento) {
     setTimeout(function(){document.getElementById(elemento).style.display = 'none';}, 5000);
 }
 
+$scope.calcularSoma = function () {
+  $scope.somaTotal = $scope.itensBuscados.reduce(function (acumulador, item) {
+    let valor  = Number(item.valorBruto) - Number(item.deducoes);
+    return acumulador + valor;
+  }, 0);
+};
+
 function fromData(data) {
-  if(data === null || data === undefined || data === '' || typeof data !== 'string') return null;
+  if(typeof data !== 'string' || data === '') return null;
 
   data = data.split('-');
   if(data.length < 3) return null;

@@ -46,27 +46,33 @@
   	  <table class="table table-hover table-responsive-sm">
 	    <thead>
 	      <tr>
-	        <th>Nº</th>
 	        <th>Vencimento</th>
+	        <th>Prestação</th>
 	        <th>Pagamento</th>
 	        <th>Valor</th>
 	        <th>Desconto</th>
 	        <th>Nota</th>
 	        <th>Serviço</th>
+	        <th>Descrição</th>
 	      </tr>
 	    </thead>
 	    <tbody>
 	      <tr ng-repeat="x in itensBuscados track by x.idParcelaContrato">
-	        <td data-toggle="tooltip" data-placement="top" title="Número">{{x.numero}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Vencimento"><p style="color: {{x.corVencimento}}">{{x.dataVencimento | dataBR}}</p></td>
+	        <td data-toggle="tooltip" data-placement="top" title="Prestação do serviço">{{x.dataPrestacao | dataBR}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Pagamento">{{x.dataPagamento | dataBR}}</td>
-	        <td data-toggle="tooltip" data-placement="top" title="Valor R$">{{x.valorBruto | dinheiro}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Valor">{{x.valorBruto | dinheiro}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Deduções">{{x.deducoes | dinheiro}}</td>
 	        <td data-toggle="tooltip" data-placement="top" title="Nº Nota Fiscal">{{x.notaFiscal}}</td>
-	        <td data-toggle="tooltip" data-placement="top" title="Serviço">{{x.observacao}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Serviço">{{x.produto.nome}}</td>
+	        <td data-toggle="tooltip" data-placement="top" title="Descrição">{{x.observacao}}</td>
 	      </tr>
 	    </tbody>
 	  </table>
+	  <hr>
+	  <div class="row">
+	  	<div class="col-sm-12"><h4>Valor total: {{somaTotal | dinheiro}}</h4></div>
+	  </div>
 
 	</div>
 
