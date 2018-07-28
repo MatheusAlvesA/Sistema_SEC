@@ -339,7 +339,7 @@ function uparBanco() {
     file_put_contents('../config.php',
                       bindConfig(
                                   $senha, Config::SQL_host, Config::SQL_db, Config::SQL_user, Config::SQL_pass,
-                                  Config::CORS, Config::EXIBIR_ERROS, Config::REQUISITAR_LOGIN
+                                  Config::CORS, Config::EXIBIR_ERROS, Config::USAR_CDN, Config::REQUISITAR_LOGIN
                                 )
                     );
     header('location: configuracao.php');
@@ -359,7 +359,7 @@ function uparBanco() {
     if($RLogin) $RLogin = true;
     else        $RLogin = false;
 
-    file_put_contents('../config.php', bindConfig('', $servidor, $nomeBanco, $usuario, $senha, $CORS, $ERROS, $CDN,  $RLogin));
+    file_put_contents('../config.php', bindConfig('', $servidor, $nomeBanco, $usuario, $senha, $CORS, $ERROS, $CDN, $RLogin));
     header('location: configuracao.php');
     exit(0);
   }
