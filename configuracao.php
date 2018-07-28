@@ -324,14 +324,7 @@ function uparBanco() {
   if($_FILES['arquivoBanco']['error']) {header("location: configuracao.php?upBanco=1");exit();}
 
   if(move_uploaded_file($_FILES['arquivoBanco']['tmp_name'], 'banco.tmp')) {
-    //Deletando o banco de dados por completo
-    system('mysql -h '.Config::SQL_host.' -u '.Config::SQL_user.' -p'.Config::SQL_pass.' '.Config::SQL_db.'
-      drop database '.Config::SQL_db.';
-      create database '.Config::SQL_db.';');
-    
-    //Importando o novo banco
     system('mysql -h '.Config::SQL_host.' -u '.Config::SQL_user.' -p'.Config::SQL_pass.' '.Config::SQL_db.' < banco.tmp');
-
     @unlink('banco.tmp');
     header("location: configuracao.php?upBanco=1");
     exit();
