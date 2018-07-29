@@ -837,6 +837,11 @@ _________________________________________________________________*/
   };
 
   $scope.voltarItens2Contratos = function() {
+    $scope.notaFiscalPreConfigurada = false;
+    $scope.notaFiscalConfigurada = {};
+    $scope.idContratoPreConfigurado = false;
+    $scope.idContratoConfigurado = null;
+
     $('#plotBusca').css({"display": 'block'}); // colocando a lista de contratos da tela
     $('#plotItens').css({"display": 'none'}); // removendo lista de itens
   };
@@ -1202,6 +1207,67 @@ _________________________________________________________________*/
         }
     );
   };
+
+/*
+  Modulo responsável por mover um item para outro contrato
+*/
+  $scope.painelMoverItem = function() {$('#tela_setar_idContrato').modal({keyboard: false});};
+
+   $scope.idContratoPreConfigurado = false;
+   $scope.idContratoConfigurado = null;
+  $scope.registrarIdContrato = function() {
+    $scope.idContratoConfigurado = Number($scope.numeroFromTelaSetarIdContrato);
+    $scope.idContratoPreConfigurado = true;
+  };
+
+  $scope.setIdContratoConfigurado = function(id) {
+    if(!$scope.idContratoPreConfigurado || $scope.idContratoConfigurado === null) return false;
+
+    for(var index = 0; index < $scope.itensBuscados.length; index++)
+      if($scope.itensBuscados[index].idParcelaContrato == id)
+        break;
+    if(index >= $scope.itensBuscados.length)
+      return false;
+
+    var item = $scope.itensBuscados[index];
+
+    let comando = {
+      'comando': 'atualizar',
+      'alvo': 'item',
+      'id': item.idParcelaContrato,
+      'parametros': {
+        'idContrato': $scope.idContratoConfigurado
+      }
+    };
+
+    requisitarAPI.post(comando,
+        function(dados) { //callback de sucesso
+          if(dados.status !== 200 || typeof dados.data === 'string') { // erro desconhecido do servidor
+            return false;
+          }
+          if(dados.data.erro !== undefined || dados.data.status === 'falha') { // algum erro conhecido detectado pelo servidor
+            return false;
+          }
+          else { // sucesso
+
+            $scope.itensBuscados = $scope.itensBuscados.filter(function(atual) {
+              if(atual.idParcelaContrato == item.idParcelaContrato) return false;
+              return true;
+            });
+            $('[data-toggle="tooltip"]').tooltip('hide'); // Escondendo o tooltip. Se o elemento for deletado vai bugar se o tooltip estiver na tela
+            return true;
+
+          }
+        },
+        function(dados) { // callback de falha
+          return false;
+        }
+    );
+  };
+
+/*
+  Fim do Modulo responsável por mover um item para outro contrato
+*/
 
   $scope.deletandoItem = false;
   $scope.deletarParcela = function(id) {

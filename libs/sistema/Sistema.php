@@ -865,6 +865,17 @@ class Sistema {
 				return false;
 			}
 
+			if(isset($dados['idContrato'])) {
+				if(gettype($dados['idContrato']) !== 'integer') // Este valor só pode ser inteiro
+					return false;
+
+				try {$item->setIdContrato($dados['idContrato']);}
+				catch (PersistenciaException $e) {
+					Logger::logar($e);
+					return false;
+				}
+			}
+
 			if(array_key_exists('idProduto', $dados)) { //Pode ser nulo, evitando usar isset
 				if($dados['idProduto'] !== null && gettype($dados['idProduto']) !== 'integer') // Este valor só pode ser nulo ou inteiro
 					return false;

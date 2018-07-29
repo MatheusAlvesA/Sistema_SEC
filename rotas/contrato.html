@@ -176,7 +176,10 @@
   		<div class="col-sm-2">
   			<button class="bnt btn-success btn-sm float-left" style="cursor: pointer;" ng-click="voltarItens2Contratos()">Voltar</button>
   		</div>
-  		<div class="col-sm-8">
+  		<div class="col-sm-4">
+  			<button class="btn btn-outline-info btn-sm float-right" style="cursor: pointer;" ng-click="painelMoverItem()">Mover item</button>
+  		</div>
+  		<div class="col-sm-4">
   			<button class="btn btn-outline-dark btn-sm float-right" style="cursor: pointer;" ng-click="painelNotaFiscal()">Registrar Nota Fical</button>
   		</div>
   		<div class="col-sm-2">
@@ -216,6 +219,7 @@
 	        	<span style="font-size: 14pt;cursor: pointer; color: #38C7E0;" ng-click="itemFoiPagoHoje(x.idParcelaContrato)" class="fa fa-calendar-check-o" data-toggle="tooltip" data-placement="top" title="Foi pago hoje"></span>-<span style="font-size: 14pt;cursor: pointer; color: #64E66D;" ng-click="editarDataPagamentoItem(x.idParcelaContrato)" class="fa fa-calendar-check-o"data-toggle="tooltip" data-placement="top" title="Foi pago em..."></span>
 	        	<br>
 	        	<span style="font-size: 14pt;cursor: pointer; color: #BCD2EE;" ng-hide="!notaFiscalPreConfigurada" ng-click="setNotaFicalConfigurada(x.idParcelaContrato)" class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="Preencher nota fiscal"></span>
+	        	<span style="font-size: 14pt;cursor: pointer; color: #BCD2EE;" ng-hide="!idContratoPreConfigurado" ng-click="setIdContratoConfigurado(x.idParcelaContrato)" class="fa fa-arrow-right" data-toggle="tooltip" data-placement="top" title="Mover para outro contrato"></span>
 			</td>
 	      </tr>
 	    </tbody>
@@ -324,7 +328,7 @@
       
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">Editar Contrato</h4>
+          <h4 class="modal-title">Editar Contrato N° {{contratoSelecionado.idContrato}}</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         
@@ -513,6 +517,36 @@
     </div>
  </div>
 <!--Fim da tela para setar a nota fiscal-->
+
+<!--Inicio da tela para setar o contrato-->
+<div class="modal fade" id="tela_setar_idContrato">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Mover para outro contrato</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+			<div class="row">
+				<label class="col-4 col-form-label">ID do Contrato: </label>
+				<div class="col-6">
+					<input class="form-control" type="number" ng-model="numeroFromTelaSetarIdContrato">
+				</div>
+			</div>
+		</div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" id="bnt_setar_dataPagamento" ng-click="registrarIdContrato()" style="cursor: pointer;">Começar...</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>
+<!--Fim da tela para setar o contrato-->
 
 <!--Inicio da tela de criação de contrato-->
 <div class="container-fluid" id="tela_criacao" style="display: none;">
