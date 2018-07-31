@@ -39,21 +39,27 @@
 </div>
 <hr>
 <div class="container-fluid" id="tela_principal">
-	<div id="plotDados">
+	<div class="row" id='containerMensagemErro'>
+		<div class="col-12">
+				<div id="mensagemErroConexao" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> Falha na conexão com o servidor, verifique sua internet
+				</div>
+				<div id="mensagemErroDesconhecido" class="alert alert-danger" style="display: none;">
+				    <strong>Erro!</strong> O servidor parece estar com problema
+				</div>
+		</div>
+	</div>
 
 	<div class="row">
 		<div class="col-11">
 			<img src="imgs/logo.png" alt="logo" style="width:40px; float: left;">
   			<h1 style="color: rgb(173,14,10);">SEC Publicidade</h1>
   		</div>
-  		<div class="col-1">
-  			<span class="fa fa-print" style="cursor: pointer; font-size: 12pt;" aria-hidden="true" ng-click="imprimir()"></span>
-  		</div>
   	</div>
 
   	<hr>
 
-  	<div id="plotDados">
+  	<div>
   		<h4>{{mesEscolhidoOnString()}}</h4>
   	  <table class="table table-hover table-responsive-sm">
 	    <thead>
@@ -75,7 +81,15 @@
 	        <td title="Data Prestação" 	style="width: 10%;">{{x.dataPrestacao | dataBR}}</td>
 	        <td title="Valor a pagar" 	style="width: 10%;">{{x.valorAPagar | dinheiro}}</td>
 	        <td title="Serviço" 		style="width: 15%;">{{x.produto.nome}}</td>
-	        <td title="Nota fiscal" 	style="width: 15%;">{{x.notaFiscalAPagar}}</td>
+	        <td title="Nota fiscal" 	style="width: 15%;" class="{{x.tableClasse}}">
+	        	<form ng-submit="submeterNota(x.idParcelaContrato)">
+				    <div class="form-group row">
+						<div class="col-12">
+							<input class="form-control" type="text" ng-model="x.notaFiscalAPagar">
+						</div>
+				    </div>
+				</form>
+			</td>
 	      </tr>
 	    </tbody>
 	  </table>
@@ -83,8 +97,6 @@
 
 	  <br><hr><br>
   </div>
-</div>
 
-</div>
 
 </div>

@@ -81,6 +81,7 @@ if($_SESSION['logado'] !== 'S' && Config::REQUISITAR_LOGIN) { // Se não estiver
         <div id="painelOperacoes">
           <a href="#!contrato" class="list-group-item list-group-item-dark">Contrato</a>
           <a href="#!cliente" class="list-group-item list-group-item-dark">Cliente</a>
+          <a href="#!APagar" class="list-group-item list-group-item-dark">Publicações a pagar</a>
           <a href="#!produto" class="list-group-item list-group-item-dark">Serviço</a>
           <a href="#!subproduto" class="list-group-item list-group-item-dark">Sub-Serviço</a>
           <a href="#!funcionario" class="list-group-item list-group-item-dark">Funcionário</a>

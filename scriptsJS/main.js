@@ -47,6 +47,9 @@
       .when("/relatorioNotaFiscal", {
           templateUrl : "rotas/relatorioNotaFiscal.html"
       })
+      .when("/APagar", {
+          templateUrl : "rotas/APagar.html"
+      })
       .when("/relatorioAPagar", {
           templateUrl : "rotas/relatorioAPagar.html"
       });
